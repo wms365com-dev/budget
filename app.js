@@ -27,6 +27,9 @@ const LEGACY_SAMPLE_BUDGET_IDS = [
 ];
 const USE_REMOTE_STORAGE = window.location.protocol !== "file:";
 const state = createEmptyState();
+const uiState = {
+  activeWorkspace: "plan"
+};
 let saveTimerId = null;
 let activeSavePromise = Promise.resolve();
 
@@ -65,6 +68,8 @@ const dom = {
   spendingSummaryList: document.getElementById("spendingSummaryList"),
   goalSummaryList: document.getElementById("goalSummaryList"),
   recentTransactionsList: document.getElementById("recentTransactionsList"),
+  workspaceTabs: Array.from(document.querySelectorAll("[data-workspace-tab]")),
+  workspacePanels: Array.from(document.querySelectorAll("[data-workspace-panel]")),
   settingsForm: document.getElementById("settingsForm"),
   currentBalanceInput: document.getElementById("currentBalanceInput"),
   safetyBufferInput: document.getElementById("safetyBufferInput"),
@@ -131,6 +136,7 @@ async function init() {
   resetAccountForm();
   resetGoalForm();
   resetBudgetForm();
+  syncWorkspacePanels();
   updateStorageStatus();
   renderApp();
   await hydrateState();
@@ -159,6 +165,7 @@ function attachEventListeners() {
   dom.exportButton.addEventListener("click", exportData);
   dom.clearDataButton.addEventListener("click", handleClearData);
   dom.importInput.addEventListener("change", importData);
+  dom.workspaceTabs.forEach((button) => button.addEventListener("click", handleWorkspaceTabClick));
 }
 
 async function hydrateState() {
@@ -566,8 +573,32 @@ function handleClearData() {
   resetBudgetForm();
 }
 
+function handleWorkspaceTabClick(event) {
+  const workspace = event.currentTarget.dataset.workspaceTab;
+  setActiveWorkspace(workspace);
+}
+
+function setActiveWorkspace(workspace) {
+  const nextWorkspace = ["plan", "activity", "accounts", "settings"].includes(workspace) ? workspace : "plan";
+  uiState.activeWorkspace = nextWorkspace;
+  syncWorkspacePanels();
+}
+
+function syncWorkspacePanels() {
+  dom.workspaceTabs.forEach((button) => {
+    const isActive = button.dataset.workspaceTab === uiState.activeWorkspace;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  dom.workspacePanels.forEach((panel) => {
+    panel.hidden = panel.dataset.workspacePanel !== uiState.activeWorkspace;
+  });
+}
+
 function renderApp() {
   syncForms();
+  syncWorkspacePanels();
   renderOverview();
   renderForecast();
   renderUpcoming();
@@ -672,7 +703,7 @@ function renderUpcoming() {
         <div class="list-item">
           <div>
             <strong class="list-title">${escapeHtml(occurrence.label)}</strong>
-            <p class="list-meta">${escapeHtml(occurrence.category)} • ${formatRelativeDate(date)}</p>
+            <p class="list-meta">${escapeHtml(occurrence.category)} - ${formatRelativeDate(date)}</p>
             <p class="list-date">${formatDate(date, "friendly")}</p>
           </div>
           <span class="amount-pill ${badgeClass}">${amountPrefix}${formatCurrency(occurrence.amount)}</span>
@@ -809,7 +840,7 @@ function renderRecentTransactions() {
         <div class="list-item">
           <div>
             <strong class="list-title">${escapeHtml(transaction.label)}</strong>
-            <p class="list-meta">${escapeHtml(transaction.category)}${account ? ` • ${escapeHtml(account)}` : ""}</p>
+            <p class="list-meta">${escapeHtml(transaction.category)}${account ? ` - ${escapeHtml(account)}` : ""}</p>
             <p class="list-date">${formatDate(parseDate(transaction.date), "friendly")}</p>
           </div>
           <span class="amount-pill ${badgeClass}">${prefix}${formatCurrency(transaction.amount)}</span>

@@ -11,13 +11,28 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="app-header">
-      <p class="eyebrow">Budget Flow Dashboard</p>
-      <h1>Run your money like a real finance hub.</h1>
-      <p class="hero-text">
-        Get the urgent cash picture first, then manage accounts, transactions, goals, recurring bills, and budgets in
-        one place. The top stays focused on risk and runway. The rest helps you operate like a serious personal finance app.
-      </p>
+    <header class="app-header card">
+      <div class="header-grid">
+        <div class="header-copy">
+          <p class="eyebrow">Budget Flow Dashboard</p>
+          <h1>See the squeeze before it turns into panic.</h1>
+          <p class="hero-text">
+            The top answers the urgent questions fast: what is safe to spend, what is due soon, and whether month-end
+            still works. The lower workspace helps you keep the plan clean without cluttering the dashboard.
+          </p>
+          <div class="hero-badges" aria-label="Product highlights">
+            <span class="hero-badge">Urgent first</span>
+            <span class="hero-badge">Forecast + runway</span>
+            <span class="hero-badge">Private control</span>
+          </div>
+        </div>
+        <div class="hero-side">
+          <p class="hero-side-label">Money command center</p>
+          <p class="hero-side-text">
+            Forecast cash, track accounts, log real spending, and keep goals visible without digging through a crowded layout.
+          </p>
+        </div>
+      </div>
     </header>
 
     <section id="riskBanner" class="card risk-banner tone-safe">
@@ -57,31 +72,31 @@
         <p class="metric-note">Based on today's cash and everything left this month.</p>
       </article>
 
-      <article class="card metric-card">
+      <article class="card metric-card bridge-card">
         <p class="section-label">Available cash</p>
         <strong id="currentBalanceValue" class="metric-value">$0.00</strong>
         <p id="currentBalanceNote" class="metric-note">Uses your liquid accounts when they are present.</p>
       </article>
 
-      <article class="card metric-card">
+      <article class="card metric-card snapshot-card">
         <p class="section-label">Tracked net worth</p>
         <strong id="netWorthValue" class="metric-value">$0.00</strong>
         <p id="netWorthNote" class="metric-note">Add accounts to track assets and liabilities.</p>
       </article>
 
-      <article class="card metric-card">
+      <article class="card metric-card snapshot-card">
         <p class="section-label">Income this month</p>
         <strong id="monthlyIncomeValue" class="metric-value positive">$0.00</strong>
         <p class="metric-note">Actual transactions if logged, otherwise your plan.</p>
       </article>
 
-      <article class="card metric-card">
+      <article class="card metric-card snapshot-card">
         <p class="section-label">Expenses this month</p>
         <strong id="monthlyExpenseValue" class="metric-value negative">$0.00</strong>
         <p class="metric-note">Actual transactions if logged, otherwise your plan.</p>
       </article>
 
-      <article class="card metric-card">
+      <article class="card metric-card snapshot-card">
         <p class="section-label">Goals funded</p>
         <strong id="goalCompletionValue" class="metric-value">$0.00</strong>
         <p id="goalCompletionNote" class="metric-note">Track savings progress across your goals.</p>
@@ -177,17 +192,39 @@
       </section>
     </main>
 
-    <section class="manage-intro">
-      <p class="section-label">Manage Your Plan</p>
-      <h2>Build the finance system that feeds the dashboard.</h2>
-      <p class="supporting-text">
-        Add recurring income and bills, track your accounts, log transactions, set savings goals, and update budget limits.
-        These sections make the dashboard behave more like a modern finance app while keeping the top focused on urgency.
-      </p>
+    <section class="card manage-intro">
+      <div class="manage-head">
+        <div class="manage-copy">
+          <p class="section-label">Workspace</p>
+          <h2>Keep the lower half organized and focused.</h2>
+          <p class="supporting-text">
+            Instead of showing every tool at once, use one workspace at a time. That keeps the dashboard calm while still
+            giving you the controls to manage recurring items, real activity, accounts, goals, and settings.
+          </p>
+        </div>
+        <div class="workspace-tabs" aria-label="Workspace sections">
+          <button class="workspace-tab is-active" data-workspace-tab="plan" type="button" aria-pressed="true">
+            <span class="workspace-tab-title">Plan</span>
+            <span class="workspace-tab-meta">Recurring bills and budgets</span>
+          </button>
+          <button class="workspace-tab" data-workspace-tab="activity" type="button" aria-pressed="false">
+            <span class="workspace-tab-title">Activity</span>
+            <span class="workspace-tab-meta">Real spending and income</span>
+          </button>
+          <button class="workspace-tab" data-workspace-tab="accounts" type="button" aria-pressed="false">
+            <span class="workspace-tab-title">Accounts</span>
+            <span class="workspace-tab-meta">Balances and goals</span>
+          </button>
+          <button class="workspace-tab" data-workspace-tab="settings" type="button" aria-pressed="false">
+            <span class="workspace-tab-title">Settings</span>
+            <span class="workspace-tab-meta">Storage and controls</span>
+          </button>
+        </div>
+      </div>
     </section>
 
     <section class="management-grid">
-      <section class="card form-panel">
+      <section class="card form-panel workspace-panel" data-workspace-panel="plan">
         <div class="section-head">
           <div>
             <p class="section-label">Cash item</p>
@@ -258,7 +295,7 @@
         <datalist id="categoryOptions"></datalist>
       </section>
 
-      <section class="card transaction-form-panel">
+      <section class="card transaction-form-panel workspace-panel" data-workspace-panel="activity" hidden>
         <div class="section-head">
           <div>
             <p class="section-label">Transaction</p>
@@ -318,7 +355,7 @@
         </form>
       </section>
 
-      <section class="card account-form-panel">
+      <section class="card account-form-panel workspace-panel" data-workspace-panel="accounts" hidden>
         <div class="section-head">
           <div>
             <p class="section-label">Account</p>
@@ -363,7 +400,7 @@
         </form>
       </section>
 
-      <section class="card goal-form-panel">
+      <section class="card goal-form-panel workspace-panel" data-workspace-panel="accounts" hidden>
         <div class="section-head">
           <div>
             <p class="section-label">Goal</p>
@@ -406,7 +443,7 @@
         </form>
       </section>
 
-      <section class="card settings-panel">
+      <section class="card settings-panel workspace-panel" data-workspace-panel="settings" hidden>
         <div class="section-head">
           <div>
             <p class="section-label">Forecast settings</p>
@@ -443,7 +480,7 @@
         </form>
       </section>
 
-      <section class="card budget-form-panel">
+      <section class="card budget-form-panel workspace-panel" data-workspace-panel="plan">
         <div class="section-head">
           <div>
             <p class="section-label">Budget limit</p>
@@ -486,7 +523,7 @@
         </div>
       </section>
 
-      <aside class="card controls-panel">
+      <aside class="card controls-panel workspace-panel" data-workspace-panel="settings" hidden>
         <p class="section-label">Data controls</p>
         <div class="action-row">
           <button id="exportButton" class="secondary-button" type="button">Export data</button>
@@ -504,7 +541,7 @@
         </p>
       </aside>
 
-      <section class="card ledger-panel">
+      <section class="card ledger-panel workspace-panel" data-workspace-panel="plan">
         <div class="section-head">
           <div>
             <p class="section-label">Recurring plan</p>
@@ -529,7 +566,7 @@
         </div>
       </section>
 
-      <section class="card transaction-ledger-panel">
+      <section class="card transaction-ledger-panel workspace-panel" data-workspace-panel="activity" hidden>
         <div class="section-head">
           <div>
             <p class="section-label">Transactions</p>
@@ -554,7 +591,7 @@
         </div>
       </section>
 
-      <section class="card account-ledger-panel">
+      <section class="card account-ledger-panel workspace-panel" data-workspace-panel="accounts" hidden>
         <div class="section-head">
           <div>
             <p class="section-label">Accounts</p>
@@ -578,7 +615,7 @@
         </div>
       </section>
 
-      <section class="card goal-ledger-panel">
+      <section class="card goal-ledger-panel workspace-panel" data-workspace-panel="accounts" hidden>
         <div class="section-head">
           <div>
             <p class="section-label">Goals</p>
