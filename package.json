@@ -1,0 +1,12 @@
+{
+  "name": "budget-flow-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal budgeting dashboard with shortfall forecasting and Railway-ready persistence.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
