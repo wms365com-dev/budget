@@ -1,11 +1,12 @@
 # Budget Flow Dashboard
 
-A personal budgeting dashboard with income and expense planning, shortfall forecasting, and Railway-ready persistent storage.
+A personal finance dashboard with accounts, manual transactions, savings goals, recurring planning, shortfall forecasting, and Railway-ready persistent storage.
 
 ## What changed
 
 - The app now runs as a Node web service with `server.js`
 - Budget data is saved through `/api/data`
+- Accounts, transactions, and savings goals are stored with the rest of the budget state
 - Local development still works on your machine
 - Railway can persist data if you attach a volume and set `DATA_DIR`
 

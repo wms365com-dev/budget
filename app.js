@@ -42,8 +42,13 @@ const dom = {
   lowestBalanceValue: document.getElementById("lowestBalanceValue"),
   watchDateValue: document.getElementById("watchDateValue"),
   currentBalanceValue: document.getElementById("currentBalanceValue"),
+  currentBalanceNote: document.getElementById("currentBalanceNote"),
+  netWorthValue: document.getElementById("netWorthValue"),
+  netWorthNote: document.getElementById("netWorthNote"),
   monthlyIncomeValue: document.getElementById("monthlyIncomeValue"),
   monthlyExpenseValue: document.getElementById("monthlyExpenseValue"),
+  goalCompletionValue: document.getElementById("goalCompletionValue"),
+  goalCompletionNote: document.getElementById("goalCompletionNote"),
   projectedEndValue: document.getElementById("projectedEndValue"),
   safeToSpendValue: document.getElementById("safeToSpendValue"),
   safeToSpendNote: document.getElementById("safeToSpendNote"),
@@ -56,6 +61,10 @@ const dom = {
   chartBufferBalance: document.getElementById("chartBufferBalance"),
   upcomingList: document.getElementById("upcomingList"),
   budgetProgressList: document.getElementById("budgetProgressList"),
+  accountSummaryList: document.getElementById("accountSummaryList"),
+  spendingSummaryList: document.getElementById("spendingSummaryList"),
+  goalSummaryList: document.getElementById("goalSummaryList"),
+  recentTransactionsList: document.getElementById("recentTransactionsList"),
   settingsForm: document.getElementById("settingsForm"),
   currentBalanceInput: document.getElementById("currentBalanceInput"),
   safetyBufferInput: document.getElementById("safetyBufferInput"),
@@ -74,6 +83,37 @@ const dom = {
   cancelEditButton: document.getElementById("cancelEditButton"),
   categoryOptions: document.getElementById("categoryOptions"),
   itemTableBody: document.getElementById("itemTableBody"),
+  transactionForm: document.getElementById("transactionForm"),
+  transactionFormTitle: document.getElementById("transactionFormTitle"),
+  transactionIdInput: document.getElementById("transactionIdInput"),
+  transactionTypeInput: document.getElementById("transactionTypeInput"),
+  transactionLabelInput: document.getElementById("transactionLabelInput"),
+  transactionAmountInput: document.getElementById("transactionAmountInput"),
+  transactionCategoryInput: document.getElementById("transactionCategoryInput"),
+  transactionAccountInput: document.getElementById("transactionAccountInput"),
+  transactionDateInput: document.getElementById("transactionDateInput"),
+  transactionNotesInput: document.getElementById("transactionNotesInput"),
+  cancelTransactionEditButton: document.getElementById("cancelTransactionEditButton"),
+  transactionTableBody: document.getElementById("transactionTableBody"),
+  accountForm: document.getElementById("accountForm"),
+  accountFormTitle: document.getElementById("accountFormTitle"),
+  accountIdInput: document.getElementById("accountIdInput"),
+  accountNameInput: document.getElementById("accountNameInput"),
+  accountInstitutionInput: document.getElementById("accountInstitutionInput"),
+  accountTypeInput: document.getElementById("accountTypeInput"),
+  accountBalanceInput: document.getElementById("accountBalanceInput"),
+  cancelAccountEditButton: document.getElementById("cancelAccountEditButton"),
+  accountTableBody: document.getElementById("accountTableBody"),
+  goalForm: document.getElementById("goalForm"),
+  goalFormTitle: document.getElementById("goalFormTitle"),
+  goalIdInput: document.getElementById("goalIdInput"),
+  goalNameInput: document.getElementById("goalNameInput"),
+  goalTargetInput: document.getElementById("goalTargetInput"),
+  goalCurrentInput: document.getElementById("goalCurrentInput"),
+  goalDueDateInput: document.getElementById("goalDueDateInput"),
+  goalNotesInput: document.getElementById("goalNotesInput"),
+  cancelGoalEditButton: document.getElementById("cancelGoalEditButton"),
+  goalTableBody: document.getElementById("goalTableBody"),
   budgetForm: document.getElementById("budgetForm"),
   budgetIdInput: document.getElementById("budgetIdInput"),
   budgetCategoryInput: document.getElementById("budgetCategoryInput"),
@@ -87,6 +127,9 @@ void init();
 async function init() {
   attachEventListeners();
   resetItemForm();
+  resetTransactionForm();
+  resetAccountForm();
+  resetGoalForm();
   resetBudgetForm();
   updateStorageStatus();
   renderApp();
@@ -97,12 +140,21 @@ async function init() {
 function attachEventListeners() {
   dom.settingsForm.addEventListener("submit", handleSettingsSubmit);
   dom.itemForm.addEventListener("submit", handleItemSubmit);
+  dom.transactionForm.addEventListener("submit", handleTransactionSubmit);
+  dom.accountForm.addEventListener("submit", handleAccountSubmit);
+  dom.goalForm.addEventListener("submit", handleGoalSubmit);
   dom.budgetForm.addEventListener("submit", handleBudgetSubmit);
   dom.cancelEditButton.addEventListener("click", resetItemForm);
+  dom.cancelTransactionEditButton.addEventListener("click", resetTransactionForm);
+  dom.cancelAccountEditButton.addEventListener("click", resetAccountForm);
+  dom.cancelGoalEditButton.addEventListener("click", resetGoalForm);
   dom.cancelBudgetEditButton.addEventListener("click", resetBudgetForm);
   dom.scheduleInput.addEventListener("change", updateScheduleLabel);
   dom.directionInput.addEventListener("change", updateScheduleLabel);
   dom.itemTableBody.addEventListener("click", handleItemTableClick);
+  dom.transactionTableBody.addEventListener("click", handleTransactionTableClick);
+  dom.accountTableBody.addEventListener("click", handleAccountTableClick);
+  dom.goalTableBody.addEventListener("click", handleGoalTableClick);
   dom.budgetTableBody.addEventListener("click", handleBudgetTableClick);
   dom.exportButton.addEventListener("click", exportData);
   dom.clearDataButton.addEventListener("click", handleClearData);
@@ -154,6 +206,9 @@ function applyState(payload) {
   const normalized = normalizeStatePayload(payload);
   state.settings = normalized.settings;
   state.items = normalized.items;
+  state.transactions = normalized.transactions;
+  state.accounts = normalized.accounts;
+  state.goals = normalized.goals;
   state.budgets = normalized.budgets;
 }
 
@@ -192,6 +247,88 @@ function handleItemSubmit(event) {
 
   persistAndRender();
   resetItemForm();
+}
+
+function handleTransactionSubmit(event) {
+  event.preventDefault();
+
+  const transaction = {
+    id: dom.transactionIdInput.value || createId("transaction"),
+    type: dom.transactionTypeInput.value,
+    label: dom.transactionLabelInput.value.trim(),
+    amount: sanitizeMoney(dom.transactionAmountInput.value),
+    category: dom.transactionCategoryInput.value.trim(),
+    accountId: dom.transactionAccountInput.value,
+    date: dom.transactionDateInput.value,
+    notes: dom.transactionNotesInput.value.trim()
+  };
+
+  if (!transaction.label || !transaction.category || !transaction.date) {
+    return;
+  }
+
+  const existingIndex = state.transactions.findIndex((entry) => entry.id === transaction.id);
+  if (existingIndex >= 0) {
+    state.transactions[existingIndex] = transaction;
+  } else {
+    state.transactions.push(transaction);
+  }
+
+  persistAndRender();
+  resetTransactionForm();
+}
+
+function handleAccountSubmit(event) {
+  event.preventDefault();
+
+  const account = {
+    id: dom.accountIdInput.value || createId("account"),
+    name: dom.accountNameInput.value.trim(),
+    institution: dom.accountInstitutionInput.value.trim(),
+    type: dom.accountTypeInput.value,
+    balance: sanitizeMoney(dom.accountBalanceInput.value)
+  };
+
+  if (!account.name) {
+    return;
+  }
+
+  const existingIndex = state.accounts.findIndex((entry) => entry.id === account.id);
+  if (existingIndex >= 0) {
+    state.accounts[existingIndex] = account;
+  } else {
+    state.accounts.push(account);
+  }
+
+  persistAndRender();
+  resetAccountForm();
+}
+
+function handleGoalSubmit(event) {
+  event.preventDefault();
+
+  const goal = {
+    id: dom.goalIdInput.value || createId("goal"),
+    name: dom.goalNameInput.value.trim(),
+    target: sanitizeMoney(dom.goalTargetInput.value),
+    current: sanitizeMoney(dom.goalCurrentInput.value),
+    dueDate: dom.goalDueDateInput.value,
+    notes: dom.goalNotesInput.value.trim()
+  };
+
+  if (!goal.name) {
+    return;
+  }
+
+  const existingIndex = state.goals.findIndex((entry) => entry.id === goal.id);
+  if (existingIndex >= 0) {
+    state.goals[existingIndex] = goal;
+  } else {
+    state.goals.push(goal);
+  }
+
+  persistAndRender();
+  resetGoalForm();
 }
 
 function handleBudgetSubmit(event) {
@@ -248,6 +385,97 @@ function handleItemTableClick(event) {
   }
 }
 
+function handleTransactionTableClick(event) {
+  const trigger = event.target.closest("button[data-action]");
+  if (!trigger) {
+    return;
+  }
+
+  const transactionId = trigger.dataset.id;
+  const transaction = state.transactions.find((entry) => entry.id === transactionId);
+  if (!transaction) {
+    return;
+  }
+
+  if (trigger.dataset.action === "edit") {
+    fillTransactionForm(transaction);
+    return;
+  }
+
+  if (!window.confirm(`Delete "${transaction.label}" from transactions?`)) {
+    return;
+  }
+
+  state.transactions = state.transactions.filter((entry) => entry.id !== transactionId);
+  persistAndRender();
+
+  if (dom.transactionIdInput.value === transactionId) {
+    resetTransactionForm();
+  }
+}
+
+function handleAccountTableClick(event) {
+  const trigger = event.target.closest("button[data-action]");
+  if (!trigger) {
+    return;
+  }
+
+  const accountId = trigger.dataset.id;
+  const account = state.accounts.find((entry) => entry.id === accountId);
+  if (!account) {
+    return;
+  }
+
+  if (trigger.dataset.action === "edit") {
+    fillAccountForm(account);
+    return;
+  }
+
+  if (!window.confirm(`Delete "${account.name}" from accounts?`)) {
+    return;
+  }
+
+  state.accounts = state.accounts.filter((entry) => entry.id !== accountId);
+  state.transactions = state.transactions.map((transaction) => ({
+    ...transaction,
+    accountId: transaction.accountId === accountId ? "" : transaction.accountId
+  }));
+  persistAndRender();
+
+  if (dom.accountIdInput.value === accountId) {
+    resetAccountForm();
+  }
+}
+
+function handleGoalTableClick(event) {
+  const trigger = event.target.closest("button[data-action]");
+  if (!trigger) {
+    return;
+  }
+
+  const goalId = trigger.dataset.id;
+  const goal = state.goals.find((entry) => entry.id === goalId);
+  if (!goal) {
+    return;
+  }
+
+  if (trigger.dataset.action === "edit") {
+    fillGoalForm(goal);
+    return;
+  }
+
+  if (!window.confirm(`Delete "${goal.name}" from goals?`)) {
+    return;
+  }
+
+  state.goals = state.goals.filter((entry) => entry.id !== goalId);
+  persistAndRender();
+
+  if (dom.goalIdInput.value === goalId) {
+    resetGoalForm();
+  }
+}
+
 function handleBudgetTableClick(event) {
   const trigger = event.target.closest("button[data-action]");
   if (!trigger) {
@@ -300,11 +528,12 @@ function importData(event) {
   reader.addEventListener("load", () => {
     try {
       const parsed = JSON.parse(reader.result);
-      state.settings = normalizeSettings(parsed.settings);
-      state.items = normalizeItems(parsed.items);
-      state.budgets = normalizeBudgets(parsed.budgets);
+      applyState(parsed);
       persistAndRender();
       resetItemForm();
+      resetTransactionForm();
+      resetAccountForm();
+      resetGoalForm();
       resetBudgetForm();
     } catch (error) {
       window.alert("That file could not be imported. Make sure it is valid dashboard JSON.");
@@ -317,7 +546,7 @@ function importData(event) {
 }
 
 function handleClearData() {
-  const confirmed = window.confirm("Clear all income, expenses, and budget limits from this dashboard?");
+  const confirmed = window.confirm("Clear all recurring items, accounts, transactions, goals, and budget limits from this dashboard?");
   if (!confirmed) {
     return;
   }
@@ -325,9 +554,15 @@ function handleClearData() {
   const emptyState = createEmptyState();
   state.settings = emptyState.settings;
   state.items = emptyState.items;
+  state.transactions = emptyState.transactions;
+  state.accounts = emptyState.accounts;
+  state.goals = emptyState.goals;
   state.budgets = emptyState.budgets;
   persistAndRender();
   resetItemForm();
+  resetTransactionForm();
+  resetAccountForm();
+  resetGoalForm();
   resetBudgetForm();
 }
 
@@ -337,9 +572,17 @@ function renderApp() {
   renderForecast();
   renderUpcoming();
   renderBudgetProgress();
+  renderAccountSummary();
+  renderSpendingSummary();
+  renderGoalSummary();
+  renderRecentTransactions();
   renderItemTable();
+  renderTransactionTable();
+  renderAccountTable();
+  renderGoalTable();
   renderBudgetTable();
   renderCategoryOptions();
+  renderTransactionAccountOptions();
 }
 
 function syncForms() {
@@ -354,9 +597,10 @@ function renderOverview() {
   const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   const monthOccurrences = getOccurrencesBetween(monthStart, monthEnd);
   const futureMonthOccurrences = monthOccurrences.filter((occurrence) => parseDate(occurrence.date) >= today);
-  const monthlyIncome = sumOccurrences(monthOccurrences, "income");
-  const monthlyExpenses = sumOccurrences(monthOccurrences, "expense");
-  const projectedMonthEndBalance = state.settings.currentBalance + sumNetAmounts(futureMonthOccurrences);
+  const actualMonthSummary = getMonthlyTransactionSummary(monthStart, monthEnd);
+  const monthlyIncome = actualMonthSummary.hasTransactions ? actualMonthSummary.income : sumOccurrences(monthOccurrences, "income");
+  const monthlyExpenses = actualMonthSummary.hasTransactions ? actualMonthSummary.expenses : sumOccurrences(monthOccurrences, "expense");
+  const projectedMonthEndBalance = getAvailableCashBalance() + sumNetAmounts(futureMonthOccurrences);
   const nextIncome = getUpcomingOccurrences(120).find((occurrence) => occurrence.direction === "income");
   const nextIncomeDate = nextIncome ? parseDate(nextIncome.date) : null;
   const expensesNext14Days = getUpcomingOccurrences(14)
@@ -364,10 +608,23 @@ function renderOverview() {
     .reduce((total, occurrence) => total + occurrence.amount, 0);
   const safeBeforeNextIncome = calculateSafeBeforeNextIncome(nextIncomeDate);
   const forecastSummary = getForecastSummary();
+  const netWorth = getNetWorth();
+  const goalSummary = getGoalSummaryTotals();
 
-  dom.currentBalanceValue.textContent = formatCurrency(state.settings.currentBalance);
+  dom.currentBalanceValue.textContent = formatCurrency(getAvailableCashBalance());
+  dom.currentBalanceNote.textContent = state.accounts.some((account) => isLiquidAccount(account.type))
+    ? `${formatCurrency(getLiquidBalance())} across checking, savings, and cash accounts.`
+    : "Using your manual balance because no liquid accounts are tracked yet.";
+  dom.netWorthValue.textContent = formatCurrency(netWorth);
+  dom.netWorthNote.textContent = state.accounts.length
+    ? `${state.accounts.length} tracked account${state.accounts.length === 1 ? "" : "s"} across assets and liabilities.`
+    : "Add accounts to turn this into a true net worth snapshot.";
   dom.monthlyIncomeValue.textContent = formatCurrency(monthlyIncome);
   dom.monthlyExpenseValue.textContent = formatCurrency(monthlyExpenses);
+  dom.goalCompletionValue.textContent = formatCurrency(goalSummary.saved);
+  dom.goalCompletionNote.textContent = goalSummary.count
+    ? `${formatCurrency(goalSummary.target)} total goal target across ${goalSummary.count} goal${goalSummary.count === 1 ? "" : "s"}.`
+    : "No goals yet. Add one to track progress toward bigger savings targets.";
   dom.projectedEndValue.textContent = formatCurrency(projectedMonthEndBalance);
   dom.safeToSpendValue.textContent = formatCurrency(safeBeforeNextIncome);
   dom.upcomingBillsValue.textContent = formatCurrency(expensesNext14Days);
@@ -391,7 +648,7 @@ function renderForecast() {
   const { series } = summary;
 
   dom.forecastDaysLabel.textContent = String(state.settings.forecastDays);
-  dom.chartStartBalance.textContent = formatCurrency(state.settings.currentBalance);
+  dom.chartStartBalance.textContent = formatCurrency(getAvailableCashBalance());
   dom.chartEndBalance.textContent = formatCurrency(series[series.length - 1].balance);
   dom.chartBufferBalance.textContent = formatCurrency(state.settings.safetyBuffer);
   dom.forecastChart.innerHTML = buildForecastSvg(series, state.settings.safetyBuffer, summary.lowestPoint);
@@ -459,6 +716,109 @@ function renderBudgetProgress() {
     .join("");
 }
 
+function renderAccountSummary() {
+  if (!state.accounts.length) {
+    dom.accountSummaryList.innerHTML = `<div class="empty-state">Add accounts like checking, savings, credit cards, or investments to track net worth.</div>`;
+    return;
+  }
+
+  const assets = state.accounts.filter((account) => isAssetAccount(account.type));
+  const liabilities = state.accounts.filter((account) => !isAssetAccount(account.type));
+
+  dom.accountSummaryList.innerHTML = [
+    buildSummaryItem("Assets", formatCurrency(sumBy(assets, "balance")), `${assets.length} tracked asset account${assets.length === 1 ? "" : "s"}.`),
+    buildSummaryItem("Liabilities", formatCurrency(liabilities.reduce((total, account) => total + Math.abs(account.balance), 0)), `${liabilities.length} tracked liability account${liabilities.length === 1 ? "" : "s"}.`),
+    buildSummaryItem("Net worth", formatCurrency(getNetWorth()), "Assets minus liabilities."),
+    buildSummaryItem("Liquid cash", formatCurrency(getLiquidBalance()), "Checking, savings, and cash accounts used for forecasting.")
+  ].join("");
+}
+
+function renderSpendingSummary() {
+  const categories = getTopSpendingCategories(5);
+
+  if (!categories.length) {
+    dom.spendingSummaryList.innerHTML = `<div class="empty-state">Log actual transactions to see where your money is really going this month.</div>`;
+    return;
+  }
+
+  dom.spendingSummaryList.innerHTML = categories
+    .map((entry) => {
+      const percent = Math.min(100, Math.round((entry.amount / Math.max(1, categories[0].amount)) * 100));
+      return `
+        <div class="budget-progress-item">
+          <div class="budget-progress-header">
+            <strong>${escapeHtml(entry.category)}</strong>
+            <strong>${formatCurrency(entry.amount)}</strong>
+          </div>
+          <div class="budget-progress-bar" aria-hidden="true">
+            <div class="budget-progress-fill" style="width: ${percent}%"></div>
+          </div>
+          <p>${entry.sourceLabel}</p>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderGoalSummary() {
+  if (!state.goals.length) {
+    dom.goalSummaryList.innerHTML = `<div class="empty-state">Add goals for emergency savings, vacations, or big purchases so progress stays visible.</div>`;
+    return;
+  }
+
+  dom.goalSummaryList.innerHTML = state.goals
+    .slice()
+    .sort((left, right) => getGoalCompletionRatio(right) - getGoalCompletionRatio(left))
+    .slice(0, 4)
+    .map((goal) => {
+      const ratio = getGoalCompletionRatio(goal);
+      const percent = Math.min(100, Math.round(ratio * 100));
+      return `
+        <div class="budget-progress-item">
+          <div class="budget-progress-header">
+            <strong>${escapeHtml(goal.name)}</strong>
+            <strong>${formatCurrency(goal.current)} / ${formatCurrency(goal.target)}</strong>
+          </div>
+          <div class="goal-progress-bar" aria-hidden="true">
+            <div class="goal-progress-fill" style="width: ${percent}%"></div>
+          </div>
+          <p>${goal.dueDate ? `Target date ${formatDate(parseDate(goal.dueDate), "friendly")}.` : "No target date set."}</p>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderRecentTransactions() {
+  const recent = state.transactions
+    .slice()
+    .sort((left, right) => parseDate(right.date) - parseDate(left.date))
+    .slice(0, 6);
+
+  if (!recent.length) {
+    dom.recentTransactionsList.innerHTML = `<div class="empty-state">Recent transactions will show up here once you start logging real activity.</div>`;
+    return;
+  }
+
+  dom.recentTransactionsList.innerHTML = recent
+    .map((transaction) => {
+      const badgeClass = transaction.type === "income" ? "income" : "expense";
+      const prefix = transaction.type === "income" ? "+" : "-";
+      const account = getAccountName(transaction.accountId);
+      return `
+        <div class="list-item">
+          <div>
+            <strong class="list-title">${escapeHtml(transaction.label)}</strong>
+            <p class="list-meta">${escapeHtml(transaction.category)}${account ? ` • ${escapeHtml(account)}` : ""}</p>
+            <p class="list-date">${formatDate(parseDate(transaction.date), "friendly")}</p>
+          </div>
+          <span class="amount-pill ${badgeClass}">${prefix}${formatCurrency(transaction.amount)}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
 function renderItemTable() {
   const today = startOfDay(new Date());
   const rows = state.items
@@ -510,6 +870,126 @@ function renderItemTable() {
     .join("");
 }
 
+function renderTransactionTable() {
+  const rows = state.transactions
+    .slice()
+    .sort((left, right) => parseDate(right.date) - parseDate(left.date));
+
+  if (!rows.length) {
+    dom.transactionTableBody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          <div class="empty-state">Add actual spending and income transactions to get a more Monarch-like monthly view.</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  dom.transactionTableBody.innerHTML = rows
+    .map((transaction) => {
+      const amountClass = transaction.type === "income" ? "positive" : "negative";
+      const amountPrefix = transaction.type === "income" ? "+" : "-";
+      const accountName = getAccountName(transaction.accountId) || "Unassigned";
+
+      return `
+        <tr>
+          <td>
+            <strong>${escapeHtml(transaction.label)}</strong>
+            <span class="row-subtitle">${transaction.notes ? escapeHtml(transaction.notes) : capitalize(transaction.type)}</span>
+          </td>
+          <td>${escapeHtml(transaction.category)}</td>
+          <td>${escapeHtml(accountName)}</td>
+          <td>${formatDate(parseDate(transaction.date), "friendly")}</td>
+          <td class="${amountClass}">${amountPrefix}${formatCurrency(transaction.amount)}</td>
+          <td>
+            <div class="table-actions">
+              <button class="text-button" data-action="edit" data-id="${transaction.id}" type="button">Edit</button>
+              <button class="text-button delete-button" data-action="delete" data-id="${transaction.id}" type="button">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function renderAccountTable() {
+  const rows = state.accounts
+    .slice()
+    .sort((left, right) => left.name.localeCompare(right.name));
+
+  if (!rows.length) {
+    dom.accountTableBody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">Add accounts to track checking, savings, credit cards, loans, and investments.</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  dom.accountTableBody.innerHTML = rows
+    .map((account) => {
+      const displayBalance = isAssetAccount(account.type) ? account.balance : -Math.abs(account.balance);
+      return `
+        <tr>
+          <td>
+            <strong>${escapeHtml(account.name)}</strong>
+          </td>
+          <td>${formatAccountType(account.type)}</td>
+          <td>${account.institution ? escapeHtml(account.institution) : "-"}</td>
+          <td class="${isAssetAccount(account.type) ? "positive" : "negative"}">${formatCurrency(displayBalance)}</td>
+          <td>
+            <div class="table-actions">
+              <button class="text-button" data-action="edit" data-id="${account.id}" type="button">Edit</button>
+              <button class="text-button delete-button" data-action="delete" data-id="${account.id}" type="button">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function renderGoalTable() {
+  const rows = state.goals
+    .slice()
+    .sort((left, right) => (right.target - right.current) - (left.target - left.current));
+
+  if (!rows.length) {
+    dom.goalTableBody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">Add goals to keep bigger savings plans visible alongside your everyday budget.</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  dom.goalTableBody.innerHTML = rows
+    .map((goal) => `
+      <tr>
+        <td>
+          <strong>${escapeHtml(goal.name)}</strong>
+          <span class="row-subtitle">${goal.notes ? escapeHtml(goal.notes) : `${Math.round(getGoalCompletionRatio(goal) * 100)}% funded`}</span>
+        </td>
+        <td>${formatCurrency(goal.target)}</td>
+        <td>${formatCurrency(goal.current)}</td>
+        <td>${goal.dueDate ? formatDate(parseDate(goal.dueDate), "friendly") : "-"}</td>
+        <td>
+          <div class="table-actions">
+            <button class="text-button" data-action="edit" data-id="${goal.id}" type="button">Edit</button>
+            <button class="text-button delete-button" data-action="delete" data-id="${goal.id}" type="button">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `)
+    .join("");
+}
+
 function renderBudgetTable() {
   const monthSpending = getCurrentMonthCategorySpend();
 
@@ -552,12 +1032,28 @@ function renderBudgetTable() {
 function renderCategoryOptions() {
   const categories = new Set();
   state.items.forEach((item) => categories.add(item.category));
+  state.transactions.forEach((transaction) => categories.add(transaction.category));
   state.budgets.forEach((budget) => categories.add(budget.category));
 
   dom.categoryOptions.innerHTML = Array.from(categories)
     .sort((left, right) => left.localeCompare(right))
     .map((category) => `<option value="${escapeHtml(category)}"></option>`)
     .join("");
+}
+
+function renderTransactionAccountOptions() {
+  const selectedValue = dom.transactionAccountInput.value;
+  const options = ['<option value="">No account linked</option>']
+    .concat(
+      state.accounts
+        .slice()
+        .sort((left, right) => left.name.localeCompare(right.name))
+        .map((account) => `<option value="${account.id}">${escapeHtml(account.name)}</option>`)
+    )
+    .join("");
+
+  dom.transactionAccountInput.innerHTML = options;
+  dom.transactionAccountInput.value = state.accounts.some((account) => account.id === selectedValue) ? selectedValue : "";
 }
 
 function fillItemForm(item) {
@@ -575,6 +1071,44 @@ function fillItemForm(item) {
   dom.itemForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
+function fillTransactionForm(transaction) {
+  dom.transactionFormTitle.textContent = `Edit ${transaction.label}`;
+  dom.transactionIdInput.value = transaction.id;
+  dom.transactionTypeInput.value = transaction.type;
+  dom.transactionLabelInput.value = transaction.label;
+  dom.transactionAmountInput.value = transaction.amount;
+  dom.transactionCategoryInput.value = transaction.category;
+  renderTransactionAccountOptions();
+  dom.transactionAccountInput.value = transaction.accountId || "";
+  dom.transactionDateInput.value = transaction.date;
+  dom.transactionNotesInput.value = transaction.notes || "";
+  dom.cancelTransactionEditButton.hidden = false;
+  dom.transactionForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function fillAccountForm(account) {
+  dom.accountFormTitle.textContent = `Edit ${account.name}`;
+  dom.accountIdInput.value = account.id;
+  dom.accountNameInput.value = account.name;
+  dom.accountInstitutionInput.value = account.institution || "";
+  dom.accountTypeInput.value = account.type;
+  dom.accountBalanceInput.value = account.balance;
+  dom.cancelAccountEditButton.hidden = false;
+  dom.accountForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function fillGoalForm(goal) {
+  dom.goalFormTitle.textContent = `Edit ${goal.name}`;
+  dom.goalIdInput.value = goal.id;
+  dom.goalNameInput.value = goal.name;
+  dom.goalTargetInput.value = goal.target;
+  dom.goalCurrentInput.value = goal.current;
+  dom.goalDueDateInput.value = goal.dueDate || "";
+  dom.goalNotesInput.value = goal.notes || "";
+  dom.cancelGoalEditButton.hidden = false;
+  dom.goalForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
 function resetItemForm() {
   dom.itemForm.reset();
   dom.itemFormTitle.textContent = "Add income, bills, or a one-time expense";
@@ -584,6 +1118,31 @@ function resetItemForm() {
   dom.startDateInput.value = toIsoDate(new Date());
   dom.cancelEditButton.hidden = true;
   updateScheduleLabel();
+}
+
+function resetTransactionForm() {
+  dom.transactionForm.reset();
+  dom.transactionFormTitle.textContent = "Log actual income or spending";
+  dom.transactionIdInput.value = "";
+  dom.transactionTypeInput.value = "expense";
+  renderTransactionAccountOptions();
+  dom.transactionDateInput.value = toIsoDate(new Date());
+  dom.cancelTransactionEditButton.hidden = true;
+}
+
+function resetAccountForm() {
+  dom.accountForm.reset();
+  dom.accountFormTitle.textContent = "Track balances and net worth";
+  dom.accountIdInput.value = "";
+  dom.accountTypeInput.value = "checking";
+  dom.cancelAccountEditButton.hidden = true;
+}
+
+function resetGoalForm() {
+  dom.goalForm.reset();
+  dom.goalFormTitle.textContent = "Track savings goals";
+  dom.goalIdInput.value = "";
+  dom.cancelGoalEditButton.hidden = true;
 }
 
 function fillBudgetForm(budget) {
@@ -651,6 +1210,9 @@ function createEmptyState() {
   return {
     settings: { ...DEFAULT_SETTINGS },
     items: [],
+    transactions: [],
+    accounts: [],
+    goals: [],
     budgets: []
   };
 }
@@ -666,7 +1228,7 @@ function getForecastSummary() {
   });
 
   const series = [];
-  let balance = state.settings.currentBalance;
+  let balance = getAvailableCashBalance();
   let lowestPoint = { date: today, balance };
 
   for (let index = 0; index <= state.settings.forecastDays; index += 1) {
@@ -859,7 +1421,7 @@ function calculateSafeBeforeNextIncome(nextIncomeDate) {
   const today = startOfDay(new Date());
   const rangeEnd = nextIncomeDate ? addDays(nextIncomeDate, -1) : addDays(today, state.settings.forecastDays);
   const occurrences = getOccurrencesBetween(today, rangeEnd);
-  const projectedBalanceBeforeIncome = state.settings.currentBalance + sumNetAmounts(occurrences);
+  const projectedBalanceBeforeIncome = getAvailableCashBalance() + sumNetAmounts(occurrences);
   return projectedBalanceBeforeIncome - state.settings.safetyBuffer;
 }
 
@@ -867,15 +1429,163 @@ function getCurrentMonthCategorySpend() {
   const today = startOfDay(new Date());
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
   const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  const occurrences = getOccurrencesBetween(monthStart, monthEnd).filter(
-    (occurrence) => occurrence.direction === "expense"
-  );
+  const transactionEntries = getMonthlyExpenseTransactions(monthStart, monthEnd);
+
+  if (transactionEntries.length) {
+    return transactionEntries.reduce((totals, transaction) => {
+      const key = getCategoryKey(transaction.category);
+      totals[key] = (totals[key] || 0) + transaction.amount;
+      return totals;
+    }, {});
+  }
+
+  const occurrences = getOccurrencesBetween(monthStart, monthEnd).filter((occurrence) => occurrence.direction === "expense");
 
   return occurrences.reduce((totals, occurrence) => {
     const key = getCategoryKey(occurrence.category);
     totals[key] = (totals[key] || 0) + occurrence.amount;
     return totals;
   }, {});
+}
+
+function getMonthlyTransactionSummary(monthStart, monthEnd) {
+  const transactions = state.transactions.filter((transaction) => {
+    const date = parseDate(transaction.date);
+    return date >= monthStart && date <= monthEnd;
+  });
+
+  return {
+    hasTransactions: transactions.length > 0,
+    income: transactions
+      .filter((transaction) => transaction.type === "income")
+      .reduce((total, transaction) => total + transaction.amount, 0),
+    expenses: transactions
+      .filter((transaction) => transaction.type === "expense")
+      .reduce((total, transaction) => total + transaction.amount, 0)
+  };
+}
+
+function getMonthlyExpenseTransactions(monthStart, monthEnd) {
+  return state.transactions.filter((transaction) => {
+    const date = parseDate(transaction.date);
+    return transaction.type === "expense" && date >= monthStart && date <= monthEnd;
+  });
+}
+
+function getTopSpendingCategories(limit) {
+  const today = startOfDay(new Date());
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const actualEntries = getMonthlyExpenseTransactions(monthStart, monthEnd);
+
+  const totals = new Map();
+  const sourceLabel = actualEntries.length ? "Based on logged transactions this month." : "Based on your recurring plan this month.";
+
+  if (actualEntries.length) {
+    actualEntries.forEach((transaction) => {
+      const key = transaction.category.trim() || "General";
+      totals.set(key, (totals.get(key) || 0) + transaction.amount);
+    });
+  } else {
+    getOccurrencesBetween(monthStart, monthEnd)
+      .filter((occurrence) => occurrence.direction === "expense")
+      .forEach((occurrence) => {
+        const key = occurrence.category.trim() || "General";
+        totals.set(key, (totals.get(key) || 0) + occurrence.amount);
+      });
+  }
+
+  return Array.from(totals.entries())
+    .map(([category, amount]) => ({ category, amount, sourceLabel }))
+    .sort((left, right) => right.amount - left.amount)
+    .slice(0, limit);
+}
+
+function getAvailableCashBalance() {
+  return state.accounts.some((account) => isLiquidAccount(account.type))
+    ? getLiquidBalance()
+    : state.settings.currentBalance;
+}
+
+function getLiquidBalance() {
+  return state.accounts
+    .filter((account) => isLiquidAccount(account.type))
+    .reduce((total, account) => total + account.balance, 0);
+}
+
+function getNetWorth() {
+  if (!state.accounts.length) {
+    return getAvailableCashBalance();
+  }
+
+  return state.accounts.reduce((total, account) => total + getAccountNetWorthValue(account), 0);
+}
+
+function getAccountNetWorthValue(account) {
+  return isAssetAccount(account.type) ? account.balance : -Math.abs(account.balance);
+}
+
+function getGoalSummaryTotals() {
+  return {
+    count: state.goals.length,
+    saved: state.goals.reduce((total, goal) => total + goal.current, 0),
+    target: state.goals.reduce((total, goal) => total + goal.target, 0)
+  };
+}
+
+function getGoalCompletionRatio(goal) {
+  if (!goal.target) {
+    return 0;
+  }
+
+  return Math.min(1, goal.current / goal.target);
+}
+
+function isLiquidAccount(type) {
+  return ["checking", "savings", "cash"].includes(type);
+}
+
+function isAssetAccount(type) {
+  return ["checking", "savings", "cash", "investment"].includes(type);
+}
+
+function getAccountName(accountId) {
+  return state.accounts.find((account) => account.id === accountId)?.name || "";
+}
+
+function formatAccountType(type) {
+  switch (type) {
+    case "checking":
+      return "Checking";
+    case "savings":
+      return "Savings";
+    case "cash":
+      return "Cash";
+    case "investment":
+      return "Investment";
+    case "credit":
+      return "Credit card";
+    case "loan":
+      return "Loan";
+    default:
+      return capitalize(type);
+  }
+}
+
+function sumBy(entries, key) {
+  return entries.reduce((total, entry) => total + (entry[key] || 0), 0);
+}
+
+function buildSummaryItem(title, value, subtitle) {
+  return `
+    <div class="list-item">
+      <div>
+        <strong class="list-title">${escapeHtml(title)}</strong>
+        <p class="list-meta">${escapeHtml(subtitle)}</p>
+      </div>
+      <span class="amount-pill income">${escapeHtml(value)}</span>
+    </div>
+  `;
 }
 
 function sumOccurrences(occurrences, direction) {
@@ -1088,6 +1798,9 @@ function normalizeStatePayload(payload) {
   return {
     settings: normalizeSettings(payload?.settings),
     items: normalizeItems(payload?.items),
+    transactions: normalizeTransactions(payload?.transactions),
+    accounts: normalizeAccounts(payload?.accounts),
+    goals: normalizeGoals(payload?.goals),
     budgets: normalizeBudgets(payload?.budgets)
   };
 }
@@ -1121,6 +1834,58 @@ function normalizeItems(items) {
     .filter((item) => item.label);
 }
 
+function normalizeTransactions(transactions) {
+  if (!Array.isArray(transactions)) {
+    return [];
+  }
+
+  return transactions
+    .map((transaction) => ({
+      id: transaction.id || createId("transaction"),
+      type: transaction.type === "income" ? "income" : "expense",
+      label: String(transaction.label || "").trim(),
+      amount: sanitizeMoney(transaction.amount),
+      category: String(transaction.category || "").trim() || "General",
+      accountId: String(transaction.accountId || ""),
+      date: isValidIsoDate(transaction.date) ? transaction.date : toIsoDate(new Date()),
+      notes: String(transaction.notes || "").trim()
+    }))
+    .filter((transaction) => transaction.label);
+}
+
+function normalizeAccounts(accounts) {
+  if (!Array.isArray(accounts)) {
+    return [];
+  }
+
+  return accounts
+    .map((account) => ({
+      id: account.id || createId("account"),
+      name: String(account.name || "").trim(),
+      institution: String(account.institution || "").trim(),
+      type: normalizeAccountType(account.type),
+      balance: sanitizeMoney(account.balance)
+    }))
+    .filter((account) => account.name);
+}
+
+function normalizeGoals(goals) {
+  if (!Array.isArray(goals)) {
+    return [];
+  }
+
+  return goals
+    .map((goal) => ({
+      id: goal.id || createId("goal"),
+      name: String(goal.name || "").trim(),
+      target: sanitizeMoney(goal.target),
+      current: sanitizeMoney(goal.current),
+      dueDate: goal.dueDate && isValidIsoDate(goal.dueDate) ? goal.dueDate : "",
+      notes: String(goal.notes || "").trim()
+    }))
+    .filter((goal) => goal.name);
+}
+
 function normalizeBudgets(budgets) {
   if (!Array.isArray(budgets)) {
     return [];
@@ -1138,6 +1903,11 @@ function normalizeBudgets(budgets) {
 function normalizeSchedule(schedule) {
   const allowed = ["once", "weekly", "biweekly", "monthly", "quarterly", "yearly"];
   return allowed.includes(schedule) ? schedule : "once";
+}
+
+function normalizeAccountType(type) {
+  const allowed = ["checking", "savings", "cash", "investment", "credit", "loan"];
+  return allowed.includes(type) ? type : "checking";
 }
 
 function isValidIsoDate(value) {

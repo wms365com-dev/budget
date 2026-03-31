@@ -19,6 +19,9 @@ const DEFAULT_STATE = {
     forecastDays: 60
   },
   items: [],
+  transactions: [],
+  accounts: [],
+  goals: [],
   budgets: []
 };
 
@@ -210,6 +213,9 @@ function normalizeStatePayload(payload) {
   return {
     settings: normalizeSettings(payload?.settings),
     items: normalizeItems(payload?.items),
+    transactions: normalizeTransactions(payload?.transactions),
+    accounts: normalizeAccounts(payload?.accounts),
+    goals: normalizeGoals(payload?.goals),
     budgets: normalizeBudgets(payload?.budgets)
   };
 }
@@ -243,6 +249,58 @@ function normalizeItems(items) {
     .filter((item) => item.label);
 }
 
+function normalizeTransactions(transactions) {
+  if (!Array.isArray(transactions)) {
+    return [];
+  }
+
+  return transactions
+    .map((transaction) => ({
+      id: String(transaction?.id || createId("transaction")),
+      type: transaction?.type === "income" ? "income" : "expense",
+      label: String(transaction?.label || "").trim(),
+      amount: sanitizeMoney(transaction?.amount),
+      category: String(transaction?.category || "").trim() || "General",
+      accountId: String(transaction?.accountId || ""),
+      date: isValidIsoDate(transaction?.date) ? transaction.date : toIsoDate(new Date()),
+      notes: String(transaction?.notes || "").trim()
+    }))
+    .filter((transaction) => transaction.label);
+}
+
+function normalizeAccounts(accounts) {
+  if (!Array.isArray(accounts)) {
+    return [];
+  }
+
+  return accounts
+    .map((account) => ({
+      id: String(account?.id || createId("account")),
+      name: String(account?.name || "").trim(),
+      institution: String(account?.institution || "").trim(),
+      type: normalizeAccountType(account?.type),
+      balance: sanitizeMoney(account?.balance)
+    }))
+    .filter((account) => account.name);
+}
+
+function normalizeGoals(goals) {
+  if (!Array.isArray(goals)) {
+    return [];
+  }
+
+  return goals
+    .map((goal) => ({
+      id: String(goal?.id || createId("goal")),
+      name: String(goal?.name || "").trim(),
+      target: sanitizeMoney(goal?.target),
+      current: sanitizeMoney(goal?.current),
+      dueDate: goal?.dueDate && isValidIsoDate(goal.dueDate) ? goal.dueDate : "",
+      notes: String(goal?.notes || "").trim()
+    }))
+    .filter((goal) => goal.name);
+}
+
 function normalizeBudgets(budgets) {
   if (!Array.isArray(budgets)) {
     return [];
@@ -260,6 +318,11 @@ function normalizeBudgets(budgets) {
 function normalizeSchedule(schedule) {
   const allowed = ["once", "weekly", "biweekly", "monthly", "quarterly", "yearly"];
   return allowed.includes(schedule) ? schedule : "once";
+}
+
+function normalizeAccountType(type) {
+  const allowed = ["checking", "savings", "cash", "investment", "credit", "loan"];
+  return allowed.includes(type) ? type : "checking";
 }
 
 function isValidIsoDate(value) {

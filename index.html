@@ -13,10 +13,10 @@
   <div class="app-shell">
     <header class="app-header">
       <p class="eyebrow">Budget Flow Dashboard</p>
-      <h1>See the urgent money picture first.</h1>
+      <h1>Run your money like a real finance hub.</h1>
       <p class="hero-text">
-        The top of the dashboard is for risk, runway, and what hits next. Income, bills, backups, and editing controls
-        live further down so the important stuff stays in view on desktop and mobile.
+        Get the urgent cash picture first, then manage accounts, transactions, goals, recurring bills, and budgets in
+        one place. The top stays focused on risk and runway. The rest helps you operate like a serious personal finance app.
       </p>
     </header>
 
@@ -54,53 +54,55 @@
       <article class="card metric-card urgent-card">
         <p class="section-label">Projected month-end</p>
         <strong id="projectedEndValue" class="metric-value">$0.00</strong>
-        <p class="metric-note">Based on today's balance and everything left this month.</p>
+        <p class="metric-note">Based on today's cash and everything left this month.</p>
       </article>
 
       <article class="card metric-card">
-        <p class="section-label">Current balance</p>
+        <p class="section-label">Available cash</p>
         <strong id="currentBalanceValue" class="metric-value">$0.00</strong>
-        <p class="metric-note">The number every other forecast starts from.</p>
+        <p id="currentBalanceNote" class="metric-note">Uses your liquid accounts when they are present.</p>
+      </article>
+
+      <article class="card metric-card">
+        <p class="section-label">Tracked net worth</p>
+        <strong id="netWorthValue" class="metric-value">$0.00</strong>
+        <p id="netWorthNote" class="metric-note">Add accounts to track assets and liabilities.</p>
       </article>
 
       <article class="card metric-card">
         <p class="section-label">Income this month</p>
         <strong id="monthlyIncomeValue" class="metric-value positive">$0.00</strong>
-        <p class="metric-note">All income scheduled for the current month.</p>
+        <p class="metric-note">Actual transactions if logged, otherwise your plan.</p>
       </article>
 
       <article class="card metric-card">
         <p class="section-label">Expenses this month</p>
         <strong id="monthlyExpenseValue" class="metric-value negative">$0.00</strong>
-        <p class="metric-note">Bills and spending planned for the current month.</p>
+        <p class="metric-note">Actual transactions if logged, otherwise your plan.</p>
+      </article>
+
+      <article class="card metric-card">
+        <p class="section-label">Goals funded</p>
+        <strong id="goalCompletionValue" class="metric-value">$0.00</strong>
+        <p id="goalCompletionNote" class="metric-note">Track savings progress across your goals.</p>
       </article>
     </section>
 
     <main class="insights-grid">
-      <section class="card upcoming-panel">
-        <div class="section-head">
-          <div>
-            <p class="section-label">Upcoming cash events</p>
-            <h3>What hits next</h3>
-          </div>
-        </div>
-        <div id="upcomingList" class="stack-list"></div>
-      </section>
-
       <section class="card chart-panel">
         <div class="section-head">
           <div>
             <p class="section-label">Forecast</p>
             <h3>Balance over the next <span id="forecastDaysLabel">60</span> days</h3>
           </div>
-          <p class="supporting-text">The line combines your current balance with every scheduled cash event.</p>
+          <p class="supporting-text">The line combines your current available cash with every scheduled cash event.</p>
         </div>
 
         <div id="forecastChart" class="forecast-chart" aria-live="polite"></div>
 
         <div class="chart-foot">
           <div>
-            <span class="muted-label">Starting balance</span>
+            <span class="muted-label">Starting cash</span>
             <strong id="chartStartBalance">$0.00</strong>
           </div>
           <div>
@@ -114,23 +116,73 @@
         </div>
       </section>
 
+      <section class="card upcoming-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Upcoming cash events</p>
+            <h3>What hits next</h3>
+          </div>
+        </div>
+        <div id="upcomingList" class="stack-list"></div>
+      </section>
+
       <section class="card budget-panel">
         <div class="section-head">
           <div>
             <p class="section-label">Category limits</p>
-            <h3>Monthly budget progress</h3>
+            <h3>Budget performance</h3>
           </div>
         </div>
         <div id="budgetProgressList" class="budget-progress-list"></div>
+      </section>
+
+      <section class="card accounts-overview-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Accounts</p>
+            <h3>Net worth snapshot</h3>
+          </div>
+        </div>
+        <div id="accountSummaryList" class="stack-list"></div>
+      </section>
+
+      <section class="card spending-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Spending</p>
+            <h3>Top categories this month</h3>
+          </div>
+        </div>
+        <div id="spendingSummaryList" class="stack-list"></div>
+      </section>
+
+      <section class="card goals-overview-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Goals</p>
+            <h3>Savings progress</h3>
+          </div>
+        </div>
+        <div id="goalSummaryList" class="stack-list"></div>
+      </section>
+
+      <section class="card recent-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Transactions</p>
+            <h3>Recent activity</h3>
+          </div>
+        </div>
+        <div id="recentTransactionsList" class="stack-list"></div>
       </section>
     </main>
 
     <section class="manage-intro">
       <p class="section-label">Manage Your Plan</p>
-      <h2>Update the details down here after the top view looks right.</h2>
+      <h2>Build the finance system that feeds the dashboard.</h2>
       <p class="supporting-text">
-        Add paychecks, bills, category limits, backups, and forecast settings below. The management tools stay lower on
-        the page so your urgent cash view remains easy to scan first.
+        Add recurring income and bills, track your accounts, log transactions, set savings goals, and update budget limits.
+        These sections make the dashboard behave more like a modern finance app while keeping the top focused on urgency.
       </p>
     </section>
 
@@ -206,6 +258,154 @@
         <datalist id="categoryOptions"></datalist>
       </section>
 
+      <section class="card transaction-form-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Transaction</p>
+            <h3 id="transactionFormTitle">Log actual income or spending</h3>
+          </div>
+        </div>
+
+        <div class="guide-box">
+          <p><strong>Use transactions</strong> to record what actually happened this month. They power spending summaries and make the budget feel more like Monarch.</p>
+        </div>
+
+        <form id="transactionForm" class="form-grid">
+          <input id="transactionIdInput" name="transactionId" type="hidden">
+
+          <label>
+            <span>Type</span>
+            <select id="transactionTypeInput" name="type" required>
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Merchant or label</span>
+            <input id="transactionLabelInput" name="label" type="text" placeholder="Trader Joe's, paycheck..." required>
+          </label>
+
+          <label>
+            <span>Amount</span>
+            <input id="transactionAmountInput" name="amount" type="number" step="0.01" min="0" required>
+          </label>
+
+          <label>
+            <span>Category</span>
+            <input id="transactionCategoryInput" name="category" type="text" list="categoryOptions" placeholder="Groceries, salary..." required>
+          </label>
+
+          <label>
+            <span>Account</span>
+            <select id="transactionAccountInput" name="accountId"></select>
+          </label>
+
+          <label>
+            <span>Date</span>
+            <input id="transactionDateInput" name="date" type="date" required>
+          </label>
+
+          <label class="full-width">
+            <span>Notes</span>
+            <textarea id="transactionNotesInput" name="notes" rows="3" placeholder="Optional note"></textarea>
+          </label>
+
+          <div class="button-row full-width">
+            <button class="primary-button" type="submit">Save transaction</button>
+            <button id="cancelTransactionEditButton" class="secondary-button" type="button" hidden>Cancel edit</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card account-form-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Account</p>
+            <h3 id="accountFormTitle">Track balances and net worth</h3>
+          </div>
+        </div>
+
+        <form id="accountForm" class="form-grid">
+          <input id="accountIdInput" name="accountId" type="hidden">
+
+          <label>
+            <span>Account name</span>
+            <input id="accountNameInput" name="name" type="text" placeholder="Checking, Visa, brokerage..." required>
+          </label>
+
+          <label>
+            <span>Institution</span>
+            <input id="accountInstitutionInput" name="institution" type="text" placeholder="Optional">
+          </label>
+
+          <label>
+            <span>Type</span>
+            <select id="accountTypeInput" name="type" required>
+              <option value="checking">Checking</option>
+              <option value="savings">Savings</option>
+              <option value="cash">Cash</option>
+              <option value="investment">Investment</option>
+              <option value="credit">Credit card</option>
+              <option value="loan">Loan</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Balance</span>
+            <input id="accountBalanceInput" name="balance" type="number" step="0.01" required>
+          </label>
+
+          <div class="button-row full-width">
+            <button class="primary-button" type="submit">Save account</button>
+            <button id="cancelAccountEditButton" class="secondary-button" type="button" hidden>Cancel edit</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card goal-form-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Goal</p>
+            <h3 id="goalFormTitle">Track savings goals</h3>
+          </div>
+        </div>
+
+        <form id="goalForm" class="form-grid">
+          <input id="goalIdInput" name="goalId" type="hidden">
+
+          <label>
+            <span>Goal name</span>
+            <input id="goalNameInput" name="name" type="text" placeholder="Emergency fund, vacation..." required>
+          </label>
+
+          <label>
+            <span>Target amount</span>
+            <input id="goalTargetInput" name="target" type="number" step="0.01" min="0" required>
+          </label>
+
+          <label>
+            <span>Saved so far</span>
+            <input id="goalCurrentInput" name="current" type="number" step="0.01" min="0" required>
+          </label>
+
+          <label>
+            <span>Target date</span>
+            <input id="goalDueDateInput" name="dueDate" type="date">
+          </label>
+
+          <label class="full-width">
+            <span>Notes</span>
+            <textarea id="goalNotesInput" name="notes" rows="3" placeholder="Optional note"></textarea>
+          </label>
+
+          <div class="button-row full-width">
+            <button class="primary-button" type="submit">Save goal</button>
+            <button id="cancelGoalEditButton" class="secondary-button" type="button" hidden>Cancel edit</button>
+          </div>
+        </form>
+      </section>
+
       <section class="card settings-panel">
         <div class="section-head">
           <div>
@@ -216,7 +416,7 @@
 
         <form id="settingsForm" class="form-grid">
           <label>
-            <span>Current balance</span>
+            <span>Manual cash balance</span>
             <input id="currentBalanceInput" name="currentBalance" type="number" step="0.01" required>
           </label>
 
@@ -234,6 +434,10 @@
               <option value="120">120 days</option>
             </select>
           </label>
+
+          <div class="full-width helper-note">
+            Used only when you have not added checking, savings, or cash accounts yet.
+          </div>
 
           <button class="primary-button" type="submit">Save settings</button>
         </form>
@@ -303,8 +507,8 @@
       <section class="card ledger-panel">
         <div class="section-head">
           <div>
-            <p class="section-label">Plan list</p>
-            <h3>Recurring and one-time cash items</h3>
+            <p class="section-label">Recurring plan</p>
+            <h3>Income, bills, and scheduled expenses</h3>
           </div>
         </div>
 
@@ -321,6 +525,79 @@
               </tr>
             </thead>
             <tbody id="itemTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card transaction-ledger-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Transactions</p>
+            <h3>Actual spending and income</h3>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Transaction</th>
+                <th>Category</th>
+                <th>Account</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="transactionTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card account-ledger-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Accounts</p>
+            <h3>Balances and institutions</h3>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Account</th>
+                <th>Type</th>
+                <th>Institution</th>
+                <th>Balance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="accountTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card goal-ledger-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Goals</p>
+            <h3>Savings targets</h3>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Goal</th>
+                <th>Target</th>
+                <th>Saved</th>
+                <th>Due</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="goalTableBody"></tbody>
           </table>
         </div>
       </section>

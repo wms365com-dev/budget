@@ -113,9 +113,19 @@ body::before {
 .chart-panel,
 .upcoming-panel,
 .budget-panel,
+.accounts-overview-panel,
+.spending-panel,
+.goals-overview-panel,
+.recent-panel,
 .settings-panel,
 .form-panel,
+.transaction-form-panel,
+.account-form-panel,
+.goal-form-panel,
 .ledger-panel,
+.transaction-ledger-panel,
+.account-ledger-panel,
+.goal-ledger-panel,
 .budget-form-panel,
 .controls-panel {
   padding: 22px;
@@ -176,7 +186,7 @@ body::before {
 .metrics-grid {
   margin-top: 18px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -228,6 +238,22 @@ body::before {
   grid-column: 9 / span 4;
 }
 
+.accounts-overview-panel {
+  grid-column: 9 / span 4;
+}
+
+.spending-panel {
+  grid-column: 9 / span 4;
+}
+
+.goals-overview-panel {
+  grid-column: 9 / span 4;
+}
+
+.recent-panel {
+  grid-column: 9 / span 4;
+}
+
 .manage-intro {
   margin-top: 30px;
   padding: 8px 4px 0;
@@ -243,25 +269,49 @@ body::before {
 }
 
 .form-panel {
-  grid-column: 1 / span 7;
+  grid-column: 1 / span 6;
+}
+
+.transaction-form-panel {
+  grid-column: 7 / span 6;
+}
+
+.account-form-panel {
+  grid-column: 1 / span 4;
+}
+
+.goal-form-panel {
+  grid-column: 5 / span 4;
 }
 
 .settings-panel {
-  grid-column: 8 / span 5;
+  grid-column: 9 / span 4;
 }
 
 .budget-form-panel {
-  grid-column: 1 / span 7;
+  grid-column: 1 / span 8;
 }
 
 .controls-panel {
-  grid-column: 8 / span 5;
+  grid-column: 9 / span 4;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 .ledger-panel {
+  grid-column: 1 / -1;
+}
+
+.transaction-ledger-panel {
+  grid-column: 1 / span 8;
+}
+
+.account-ledger-panel {
+  grid-column: 9 / span 4;
+}
+
+.goal-ledger-panel {
   grid-column: 1 / -1;
 }
 
@@ -313,6 +363,20 @@ body::before {
   justify-content: space-between;
   gap: 16px;
   align-items: center;
+}
+
+.insight-item {
+  display: grid;
+  gap: 10px;
+}
+
+.insight-item strong {
+  display: block;
+}
+
+.summary-grid {
+  display: grid;
+  gap: 10px;
 }
 
 .list-title,
@@ -368,6 +432,20 @@ body::before {
 
 .budget-progress-fill.warning {
   background: linear-gradient(90deg, #c98a34 0%, #b44d44 100%);
+}
+
+.goal-progress-bar {
+  overflow: hidden;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(29, 43, 34, 0.08);
+  margin-top: 12px;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #c98a34 0%, #1d6a4a 100%);
 }
 
 .guide-box {
@@ -607,15 +685,37 @@ td strong {
 
   .upcoming-panel,
   .budget-panel,
+  .accounts-overview-panel,
+  .spending-panel,
+  .goals-overview-panel,
+  .recent-panel,
   .form-panel,
+  .transaction-form-panel,
+  .account-form-panel,
+  .goal-form-panel,
   .settings-panel,
   .budget-form-panel,
   .controls-panel,
-  .ledger-panel {
+  .ledger-panel,
+  .transaction-ledger-panel,
+  .account-ledger-panel,
+  .goal-ledger-panel {
     grid-column: span 3;
   }
 
   .ledger-panel {
+    grid-column: 1 / -1;
+  }
+
+  .transaction-ledger-panel {
+    grid-column: 1 / -1;
+  }
+
+  .account-ledger-panel {
+    grid-column: 1 / -1;
+  }
+
+  .goal-ledger-panel {
     grid-column: 1 / -1;
   }
 }
@@ -692,34 +792,84 @@ td strong {
     order: 3;
   }
 
+  .accounts-overview-panel {
+    order: 4;
+  }
+
+  .spending-panel {
+    order: 5;
+  }
+
+  .goals-overview-panel {
+    order: 6;
+  }
+
+  .recent-panel {
+    order: 7;
+  }
+
   .form-panel {
     order: 1;
   }
 
-  .settings-panel {
+  .transaction-form-panel {
     order: 2;
   }
 
-  .budget-form-panel {
+  .account-form-panel {
     order: 3;
   }
 
-  .ledger-panel {
+  .goal-form-panel {
     order: 4;
   }
 
-  .controls-panel {
+  .settings-panel {
     order: 5;
+  }
+
+  .budget-form-panel {
+    order: 6;
+  }
+
+  .ledger-panel {
+    order: 7;
+  }
+
+  .transaction-ledger-panel {
+    order: 8;
+  }
+
+  .account-ledger-panel {
+    order: 9;
+  }
+
+  .goal-ledger-panel {
+    order: 10;
+  }
+
+  .controls-panel {
+    order: 11;
   }
 
   .upcoming-panel,
   .chart-panel,
   .budget-panel,
+  .accounts-overview-panel,
+  .spending-panel,
+  .goals-overview-panel,
+  .recent-panel,
   .form-panel,
+  .transaction-form-panel,
+  .account-form-panel,
+  .goal-form-panel,
   .settings-panel,
   .budget-form-panel,
   .controls-panel,
-  .ledger-panel {
+  .ledger-panel,
+  .transaction-ledger-panel,
+  .account-ledger-panel,
+  .goal-ledger-panel {
     grid-column: auto;
   }
 
