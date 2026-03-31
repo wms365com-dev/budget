@@ -28,12 +28,14 @@ const LEGACY_SAMPLE_BUDGET_IDS = [
 const USE_REMOTE_STORAGE = window.location.protocol !== "file:";
 const state = createEmptyState();
 const uiState = {
-  activeWorkspace: "plan"
+  activeWorkspace: "plan",
+  activeMobileScreen: "summary"
 };
 let saveTimerId = null;
 let activeSavePromise = Promise.resolve();
 
 const dom = {
+  appShell: document.getElementById("appShell"),
   exportButton: document.getElementById("exportButton"),
   importInput: document.getElementById("importInput"),
   clearDataButton: document.getElementById("clearDataButton"),
@@ -70,6 +72,8 @@ const dom = {
   recentTransactionsList: document.getElementById("recentTransactionsList"),
   workspaceTabs: Array.from(document.querySelectorAll("[data-workspace-tab]")),
   workspacePanels: Array.from(document.querySelectorAll("[data-workspace-panel]")),
+  mobileTabs: Array.from(document.querySelectorAll("[data-mobile-tab]")),
+  mobileScreens: Array.from(document.querySelectorAll("[data-mobile-screen]")),
   settingsForm: document.getElementById("settingsForm"),
   currentBalanceInput: document.getElementById("currentBalanceInput"),
   safetyBufferInput: document.getElementById("safetyBufferInput"),
@@ -126,6 +130,7 @@ const dom = {
   cancelBudgetEditButton: document.getElementById("cancelBudgetEditButton"),
   budgetTableBody: document.getElementById("budgetTableBody")
 };
+dom.visibilityTargets = Array.from(new Set([...dom.workspacePanels, ...dom.mobileScreens]));
 
 void init();
 
@@ -136,7 +141,7 @@ async function init() {
   resetAccountForm();
   resetGoalForm();
   resetBudgetForm();
-  syncWorkspacePanels();
+  syncUiVisibility();
   updateStorageStatus();
   renderApp();
   await hydrateState();
@@ -166,6 +171,8 @@ function attachEventListeners() {
   dom.clearDataButton.addEventListener("click", handleClearData);
   dom.importInput.addEventListener("change", importData);
   dom.workspaceTabs.forEach((button) => button.addEventListener("click", handleWorkspaceTabClick));
+  dom.mobileTabs.forEach((button) => button.addEventListener("click", handleMobileTabClick));
+  window.addEventListener("resize", renderApp);
 }
 
 async function hydrateState() {
@@ -581,24 +588,54 @@ function handleWorkspaceTabClick(event) {
 function setActiveWorkspace(workspace) {
   const nextWorkspace = ["plan", "activity", "accounts", "settings"].includes(workspace) ? workspace : "plan";
   uiState.activeWorkspace = nextWorkspace;
-  syncWorkspacePanels();
+  syncUiVisibility();
 }
 
-function syncWorkspacePanels() {
+function handleMobileTabClick(event) {
+  const screen = event.currentTarget.dataset.mobileTab;
+  setActiveMobileScreen(screen);
+}
+
+function setActiveMobileScreen(screen) {
+  const nextScreen = ["summary", "forecast", "income", "expense", "budget", "more"].includes(screen) ? screen : "summary";
+  uiState.activeMobileScreen = nextScreen;
+  syncEntryMode();
+  syncUiVisibility();
+
+  if (isMobileViewport()) {
+    dom.appShell.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
+
+function syncUiVisibility() {
   dom.workspaceTabs.forEach((button) => {
     const isActive = button.dataset.workspaceTab === uiState.activeWorkspace;
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
   });
 
-  dom.workspacePanels.forEach((panel) => {
-    panel.hidden = panel.dataset.workspacePanel !== uiState.activeWorkspace;
+  dom.mobileTabs.forEach((button) => {
+    const isActive = button.dataset.mobileTab === uiState.activeMobileScreen;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  dom.visibilityTargets.forEach((element) => {
+    const isDesktop = !isMobileViewport();
+    const workspaceName = element.dataset.workspacePanel;
+    const mobileScreens = (element.dataset.mobileScreen || "")
+      .split(/\s+/)
+      .filter(Boolean);
+    const matchesWorkspace = !workspaceName || workspaceName === uiState.activeWorkspace;
+    const matchesMobileScreen = !mobileScreens.length || mobileScreens.includes(uiState.activeMobileScreen);
+    element.hidden = isDesktop ? !matchesWorkspace : !matchesMobileScreen;
   });
 }
 
 function renderApp() {
   syncForms();
-  syncWorkspacePanels();
+  syncEntryMode();
+  syncUiVisibility();
   renderOverview();
   renderForecast();
   renderUpcoming();
@@ -620,6 +657,24 @@ function syncForms() {
   dom.currentBalanceInput.value = state.settings.currentBalance;
   dom.safetyBufferInput.value = state.settings.safetyBuffer;
   dom.forecastDaysInput.value = String(state.settings.forecastDays);
+}
+
+function syncEntryMode() {
+  if (!dom.itemIdInput.value) {
+    dom.itemFormTitle.textContent = getDefaultItemFormTitle();
+    if (!dom.labelInput.value.trim()) {
+      dom.directionInput.value = getPreferredItemDirection();
+    }
+  }
+
+  if (!dom.transactionIdInput.value) {
+    dom.transactionFormTitle.textContent = getDefaultTransactionFormTitle();
+    if (!dom.transactionLabelInput.value.trim()) {
+      dom.transactionTypeInput.value = getPreferredTransactionType();
+    }
+  }
+
+  updateScheduleLabel();
 }
 
 function renderOverview() {
@@ -854,6 +909,10 @@ function renderItemTable() {
   const today = startOfDay(new Date());
   const rows = state.items
     .slice()
+    .filter((item) => {
+      const filter = getMobileCashFilter();
+      return !filter || item.direction === filter;
+    })
     .sort((left, right) => {
       const nextLeft = getNextOccurrence(left, today);
       const nextRight = getNextOccurrence(right, today);
@@ -866,7 +925,7 @@ function renderItemTable() {
     dom.itemTableBody.innerHTML = `
       <tr>
         <td colspan="6">
-          <div class="empty-state">Add your first income or expense in the Cash item form. Use the due date for bills and the pay date for income.</div>
+          <div class="empty-state">${getItemEmptyStateMessage()}</div>
         </td>
       </tr>
     `;
@@ -904,13 +963,17 @@ function renderItemTable() {
 function renderTransactionTable() {
   const rows = state.transactions
     .slice()
+    .filter((transaction) => {
+      const filter = getMobileCashFilter();
+      return !filter || transaction.type === filter;
+    })
     .sort((left, right) => parseDate(right.date) - parseDate(left.date));
 
   if (!rows.length) {
     dom.transactionTableBody.innerHTML = `
       <tr>
         <td colspan="6">
-          <div class="empty-state">Add actual spending and income transactions to get a more Monarch-like monthly view.</div>
+          <div class="empty-state">${getTransactionEmptyStateMessage()}</div>
         </td>
       </tr>
     `;
@@ -1088,6 +1151,10 @@ function renderTransactionAccountOptions() {
 }
 
 function fillItemForm(item) {
+  if (isMobileViewport()) {
+    setActiveMobileScreen(item.direction === "income" ? "income" : "expense");
+  }
+
   dom.itemFormTitle.textContent = `Edit ${item.label}`;
   dom.itemIdInput.value = item.id;
   dom.directionInput.value = item.direction;
@@ -1103,6 +1170,10 @@ function fillItemForm(item) {
 }
 
 function fillTransactionForm(transaction) {
+  if (isMobileViewport()) {
+    setActiveMobileScreen(transaction.type === "income" ? "income" : "expense");
+  }
+
   dom.transactionFormTitle.textContent = `Edit ${transaction.label}`;
   dom.transactionIdInput.value = transaction.id;
   dom.transactionTypeInput.value = transaction.type;
@@ -1118,6 +1189,10 @@ function fillTransactionForm(transaction) {
 }
 
 function fillAccountForm(account) {
+  if (isMobileViewport()) {
+    setActiveMobileScreen("more");
+  }
+
   dom.accountFormTitle.textContent = `Edit ${account.name}`;
   dom.accountIdInput.value = account.id;
   dom.accountNameInput.value = account.name;
@@ -1129,6 +1204,10 @@ function fillAccountForm(account) {
 }
 
 function fillGoalForm(goal) {
+  if (isMobileViewport()) {
+    setActiveMobileScreen("more");
+  }
+
   dom.goalFormTitle.textContent = `Edit ${goal.name}`;
   dom.goalIdInput.value = goal.id;
   dom.goalNameInput.value = goal.name;
@@ -1142,9 +1221,9 @@ function fillGoalForm(goal) {
 
 function resetItemForm() {
   dom.itemForm.reset();
-  dom.itemFormTitle.textContent = "Add income, bills, or a one-time expense";
+  dom.itemFormTitle.textContent = getDefaultItemFormTitle();
   dom.itemIdInput.value = "";
-  dom.directionInput.value = "income";
+  dom.directionInput.value = getPreferredItemDirection();
   dom.scheduleInput.value = "once";
   dom.startDateInput.value = toIsoDate(new Date());
   dom.cancelEditButton.hidden = true;
@@ -1153,9 +1232,9 @@ function resetItemForm() {
 
 function resetTransactionForm() {
   dom.transactionForm.reset();
-  dom.transactionFormTitle.textContent = "Log actual income or spending";
+  dom.transactionFormTitle.textContent = getDefaultTransactionFormTitle();
   dom.transactionIdInput.value = "";
-  dom.transactionTypeInput.value = "expense";
+  dom.transactionTypeInput.value = getPreferredTransactionType();
   renderTransactionAccountOptions();
   dom.transactionDateInput.value = toIsoDate(new Date());
   dom.cancelTransactionEditButton.hidden = true;
@@ -1177,6 +1256,10 @@ function resetGoalForm() {
 }
 
 function fillBudgetForm(budget) {
+  if (isMobileViewport()) {
+    setActiveMobileScreen("budget");
+  }
+
   dom.budgetIdInput.value = budget.id;
   dom.budgetCategoryInput.value = budget.category;
   dom.budgetLimitInput.value = budget.limit;
@@ -1188,6 +1271,98 @@ function resetBudgetForm() {
   dom.budgetForm.reset();
   dom.budgetIdInput.value = "";
   dom.cancelBudgetEditButton.hidden = true;
+}
+
+function isMobileViewport() {
+  return window.matchMedia("(max-width: 920px)").matches;
+}
+
+function getPreferredItemDirection() {
+  if (!isMobileViewport()) {
+    return "income";
+  }
+
+  return uiState.activeMobileScreen === "expense" ? "expense" : "income";
+}
+
+function getPreferredTransactionType() {
+  if (!isMobileViewport()) {
+    return "expense";
+  }
+
+  return uiState.activeMobileScreen === "income" ? "income" : "expense";
+}
+
+function getDefaultItemFormTitle() {
+  if (!isMobileViewport()) {
+    return "Add income, bills, or a one-time expense";
+  }
+
+  if (uiState.activeMobileScreen === "income") {
+    return "Add planned income";
+  }
+
+  if (uiState.activeMobileScreen === "expense") {
+    return "Add bill or planned expense";
+  }
+
+  return "Add income, bills, or a one-time expense";
+}
+
+function getDefaultTransactionFormTitle() {
+  if (!isMobileViewport()) {
+    return "Log actual income or spending";
+  }
+
+  if (uiState.activeMobileScreen === "income") {
+    return "Log received income";
+  }
+
+  if (uiState.activeMobileScreen === "expense") {
+    return "Log real spending";
+  }
+
+  return "Log actual income or spending";
+}
+
+function getMobileCashFilter() {
+  if (!isMobileViewport()) {
+    return "";
+  }
+
+  if (uiState.activeMobileScreen === "income") {
+    return "income";
+  }
+
+  if (uiState.activeMobileScreen === "expense") {
+    return "expense";
+  }
+
+  return "";
+}
+
+function getItemEmptyStateMessage() {
+  if (getMobileCashFilter() === "income") {
+    return "Add your first paycheck, transfer, or other planned income here.";
+  }
+
+  if (getMobileCashFilter() === "expense") {
+    return "Add your first bill or planned expense here. Use due dates for anything you need to watch closely.";
+  }
+
+  return "Add your first income or expense in the Cash item form. Use the due date for bills and the pay date for income.";
+}
+
+function getTransactionEmptyStateMessage() {
+  if (getMobileCashFilter() === "income") {
+    return "Log income transactions here so the dashboard reflects what actually came in.";
+  }
+
+  if (getMobileCashFilter() === "expense") {
+    return "Log spending transactions here to keep this month's numbers real.";
+  }
+
+  return "Add actual spending and income transactions to get a more Monarch-like monthly view.";
 }
 
 function updateScheduleLabel() {
