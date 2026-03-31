@@ -545,23 +545,23 @@ body::after {
 }
 
 .form-panel {
-  grid-column: 1 / span 5;
+  grid-column: 1 / span 6;
 }
 
 .budget-form-panel {
-  grid-column: 6 / span 7;
-}
-
-.ledger-panel {
   grid-column: 1 / -1;
 }
 
+.ledger-panel {
+  grid-column: 1 / span 6;
+}
+
 .transaction-form-panel {
-  grid-column: 1 / span 4;
+  grid-column: 7 / span 6;
 }
 
 .transaction-ledger-panel {
-  grid-column: 5 / span 8;
+  grid-column: 7 / span 6;
 }
 
 .account-form-panel {
@@ -572,23 +572,34 @@ body::after {
   grid-column: 5 / span 4;
 }
 
-.account-ledger-panel {
-  grid-column: 9 / span 4;
-}
-
 .goal-ledger-panel {
   grid-column: 1 / -1;
 }
 
 .settings-panel {
-  grid-column: 1 / span 5;
+  grid-column: 9 / span 4;
 }
 
 .controls-panel {
-  grid-column: 6 / span 7;
+  grid-column: 1 / span 4;
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.account-ledger-panel {
+  grid-column: 5 / span 8;
+}
+
+@media (min-width: 921px) {
+  .form-panel,
+  .transaction-form-panel,
+  .budget-form-panel {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    z-index: 1;
+  }
 }
 
 .section-head {
@@ -1013,25 +1024,27 @@ td strong {
   }
 
   .form-panel,
-  .budget-form-panel,
   .transaction-form-panel,
-  .transaction-ledger-panel,
   .account-form-panel,
   .goal-form-panel,
-  .account-ledger-panel,
-  .goal-ledger-panel,
   .settings-panel,
   .controls-panel {
     grid-column: span 3;
   }
 
-  .ledger-panel {
+  .ledger-panel,
+  .transaction-ledger-panel {
+    grid-column: span 3;
+  }
+
+  .budget-form-panel,
+  .account-ledger-panel,
+  .goal-ledger-panel {
     grid-column: 1 / -1;
   }
 
-  .transaction-ledger-panel,
-  .goal-ledger-panel {
-    grid-column: 1 / -1;
+  .ledger-panel {
+    grid-column: span 3;
   }
 }
 

@@ -78,6 +78,7 @@ const dom = {
   forecastDaysInput: document.getElementById("forecastDaysInput"),
   itemForm: document.getElementById("itemForm"),
   itemFormTitle: document.getElementById("itemFormTitle"),
+  itemSubmitButton: document.querySelector("#itemForm button[type='submit']"),
   itemIdInput: document.getElementById("itemIdInput"),
   directionInput: document.getElementById("directionInput"),
   labelInput: document.getElementById("labelInput"),
@@ -92,6 +93,7 @@ const dom = {
   itemTableBody: document.getElementById("itemTableBody"),
   transactionForm: document.getElementById("transactionForm"),
   transactionFormTitle: document.getElementById("transactionFormTitle"),
+  transactionSubmitButton: document.querySelector("#transactionForm button[type='submit']"),
   transactionIdInput: document.getElementById("transactionIdInput"),
   transactionTypeInput: document.getElementById("transactionTypeInput"),
   transactionLabelInput: document.getElementById("transactionLabelInput"),
@@ -128,6 +130,8 @@ const dom = {
   cancelBudgetEditButton: document.getElementById("cancelBudgetEditButton"),
   budgetTableBody: document.getElementById("budgetTableBody")
 };
+dom.itemTypeField = dom.directionInput.closest("label");
+dom.transactionTypeField = dom.transactionTypeInput.closest("label");
 dom.visibilityTargets = Array.from(new Set(dom.appScreens));
 
 void init();
@@ -589,7 +593,7 @@ function setActiveAppScreen(screen) {
   syncAppScreens();
 
   if (dom.appContent) {
-    dom.appContent.scrollTo({ top: 0, behavior: "smooth" });
+    dom.appContent.scrollTop = 0;
   }
 }
 
@@ -637,19 +641,33 @@ function syncForms() {
 }
 
 function syncEntryMode() {
+  const cashFilter = getCashScreenFilter();
+  const isCashEntryScreen = Boolean(cashFilter);
+
+  dom.itemTypeField.hidden = isCashEntryScreen;
+  dom.transactionTypeField.hidden = isCashEntryScreen;
+
   if (!dom.itemIdInput.value) {
     dom.itemFormTitle.textContent = getDefaultItemFormTitle();
-    if (!dom.labelInput.value.trim()) {
-      dom.directionInput.value = getPreferredItemDirection();
-    }
+    dom.directionInput.value = getPreferredItemDirection();
   }
 
   if (!dom.transactionIdInput.value) {
     dom.transactionFormTitle.textContent = getDefaultTransactionFormTitle();
-    if (!dom.transactionLabelInput.value.trim()) {
-      dom.transactionTypeInput.value = getPreferredTransactionType();
-    }
+    dom.transactionTypeInput.value = getPreferredTransactionType();
   }
+
+  dom.itemSubmitButton.textContent = cashFilter === "income"
+    ? "Save planned income"
+    : cashFilter === "expense"
+      ? "Save planned expense"
+      : "Save cash item";
+
+  dom.transactionSubmitButton.textContent = cashFilter === "income"
+    ? "Save income transaction"
+    : cashFilter === "expense"
+      ? "Save expense transaction"
+      : "Save transaction";
 
   updateScheduleLabel();
 }
