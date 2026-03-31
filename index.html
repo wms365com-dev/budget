@@ -11,7 +11,23 @@
 </head>
 <body>
   <div class="app-shell" id="appShell">
-    <header class="app-header card" data-mobile-screen="summary">
+    <header class="app-nav card">
+      <div class="app-nav-brand">
+        <p class="eyebrow">Budget Flow Dashboard</p>
+        <strong class="app-nav-title">Personal cash flow</strong>
+      </div>
+      <nav class="desktop-tabbar" aria-label="App sections">
+        <button class="desktop-tab is-active" data-app-tab="summary" type="button" aria-pressed="true">Summary</button>
+        <button class="desktop-tab" data-app-tab="forecast" type="button" aria-pressed="false">Forecast</button>
+        <button class="desktop-tab" data-app-tab="income" type="button" aria-pressed="false">Income</button>
+        <button class="desktop-tab" data-app-tab="expense" type="button" aria-pressed="false">Expense</button>
+        <button class="desktop-tab" data-app-tab="budget" type="button" aria-pressed="false">Budget</button>
+        <button class="desktop-tab" data-app-tab="more" type="button" aria-pressed="false">More</button>
+      </nav>
+    </header>
+
+    <main class="app-content" id="appContent">
+    <header class="app-header card" data-app-screen="summary">
       <div class="header-grid">
         <div class="header-copy">
           <p class="eyebrow">Budget Flow Dashboard</p>
@@ -35,7 +51,7 @@
       </div>
     </header>
 
-    <section id="riskBanner" class="card risk-banner tone-safe" data-mobile-screen="summary forecast">
+    <section id="riskBanner" class="card risk-banner tone-safe" data-app-screen="summary forecast">
       <div>
         <p class="section-label">Cash flow outlook</p>
         <h2 id="riskTitle">You stay above your buffer.</h2>
@@ -53,7 +69,7 @@
       </div>
     </section>
 
-    <section class="metrics-grid" aria-label="Budget overview" data-mobile-screen="summary">
+    <section class="metrics-grid" aria-label="Budget overview" data-app-screen="summary">
       <article class="card metric-card urgent-card">
         <p class="section-label">Safe before next income</p>
         <strong id="safeToSpendValue" class="metric-value">$0.00</strong>
@@ -103,8 +119,8 @@
       </article>
     </section>
 
-    <main class="insights-grid" data-mobile-screen="summary forecast budget more">
-      <section class="card chart-panel" data-mobile-screen="forecast">
+    <section class="insights-grid" data-app-screen="summary forecast budget more">
+      <section class="card chart-panel" data-app-screen="summary forecast">
         <div class="section-head">
           <div>
             <p class="section-label">Forecast</p>
@@ -131,7 +147,7 @@
         </div>
       </section>
 
-      <section class="card upcoming-panel" data-mobile-screen="summary forecast">
+      <section class="card upcoming-panel" data-app-screen="summary forecast">
         <div class="section-head">
           <div>
             <p class="section-label">Upcoming cash events</p>
@@ -141,7 +157,7 @@
         <div id="upcomingList" class="stack-list"></div>
       </section>
 
-      <section class="card budget-panel" data-mobile-screen="budget">
+      <section class="card budget-panel" data-app-screen="budget">
         <div class="section-head">
           <div>
             <p class="section-label">Category limits</p>
@@ -151,7 +167,7 @@
         <div id="budgetProgressList" class="budget-progress-list"></div>
       </section>
 
-      <section class="card accounts-overview-panel" data-mobile-screen="summary more">
+      <section class="card accounts-overview-panel" data-app-screen="summary more">
         <div class="section-head">
           <div>
             <p class="section-label">Accounts</p>
@@ -161,7 +177,7 @@
         <div id="accountSummaryList" class="stack-list"></div>
       </section>
 
-      <section class="card spending-panel" data-mobile-screen="summary budget">
+      <section class="card spending-panel" data-app-screen="summary budget">
         <div class="section-head">
           <div>
             <p class="section-label">Spending</p>
@@ -171,7 +187,7 @@
         <div id="spendingSummaryList" class="stack-list"></div>
       </section>
 
-      <section class="card goals-overview-panel" data-mobile-screen="summary more">
+      <section class="card goals-overview-panel" data-app-screen="summary more">
         <div class="section-head">
           <div>
             <p class="section-label">Goals</p>
@@ -181,7 +197,7 @@
         <div id="goalSummaryList" class="stack-list"></div>
       </section>
 
-      <section class="card recent-panel" data-mobile-screen="summary expense">
+      <section class="card recent-panel" data-app-screen="summary">
         <div class="section-head">
           <div>
             <p class="section-label">Transactions</p>
@@ -190,41 +206,10 @@
         </div>
         <div id="recentTransactionsList" class="stack-list"></div>
       </section>
-    </main>
-
-    <section class="card manage-intro" data-mobile-screen="desktop-only">
-      <div class="manage-head">
-        <div class="manage-copy">
-          <p class="section-label">Workspace</p>
-          <h2>Keep the lower half organized and focused.</h2>
-          <p class="supporting-text">
-            Instead of showing every tool at once, use one workspace at a time. That keeps the dashboard calm while still
-            giving you the controls to manage recurring items, real activity, accounts, goals, and settings.
-          </p>
-        </div>
-        <div class="workspace-tabs" aria-label="Workspace sections">
-          <button class="workspace-tab is-active" data-workspace-tab="plan" type="button" aria-pressed="true">
-            <span class="workspace-tab-title">Plan</span>
-            <span class="workspace-tab-meta">Recurring bills and budgets</span>
-          </button>
-          <button class="workspace-tab" data-workspace-tab="activity" type="button" aria-pressed="false">
-            <span class="workspace-tab-title">Activity</span>
-            <span class="workspace-tab-meta">Real spending and income</span>
-          </button>
-          <button class="workspace-tab" data-workspace-tab="accounts" type="button" aria-pressed="false">
-            <span class="workspace-tab-title">Accounts</span>
-            <span class="workspace-tab-meta">Balances and goals</span>
-          </button>
-          <button class="workspace-tab" data-workspace-tab="settings" type="button" aria-pressed="false">
-            <span class="workspace-tab-title">Settings</span>
-            <span class="workspace-tab-meta">Storage and controls</span>
-          </button>
-        </div>
-      </div>
     </section>
 
-    <section class="management-grid" data-mobile-screen="income expense budget more">
-      <section class="card form-panel workspace-panel" data-workspace-panel="plan" data-mobile-screen="income expense">
+    <section class="management-grid" data-app-screen="income expense budget more">
+      <section class="card form-panel" data-app-screen="income expense">
         <div class="section-head">
           <div>
             <p class="section-label">Cash item</p>
@@ -295,7 +280,7 @@
         <datalist id="categoryOptions"></datalist>
       </section>
 
-      <section class="card transaction-form-panel workspace-panel" data-workspace-panel="activity" data-mobile-screen="income expense" hidden>
+      <section class="card transaction-form-panel" data-app-screen="income expense">
         <div class="section-head">
           <div>
             <p class="section-label">Transaction</p>
@@ -355,7 +340,7 @@
         </form>
       </section>
 
-      <section class="card account-form-panel workspace-panel" data-workspace-panel="accounts" data-mobile-screen="more" hidden>
+      <section class="card account-form-panel" data-app-screen="more">
         <div class="section-head">
           <div>
             <p class="section-label">Account</p>
@@ -400,7 +385,7 @@
         </form>
       </section>
 
-      <section class="card goal-form-panel workspace-panel" data-workspace-panel="accounts" data-mobile-screen="more" hidden>
+      <section class="card goal-form-panel" data-app-screen="more">
         <div class="section-head">
           <div>
             <p class="section-label">Goal</p>
@@ -443,7 +428,7 @@
         </form>
       </section>
 
-      <section class="card settings-panel workspace-panel" data-workspace-panel="settings" data-mobile-screen="more" hidden>
+      <section class="card settings-panel" data-app-screen="more">
         <div class="section-head">
           <div>
             <p class="section-label">Forecast settings</p>
@@ -480,7 +465,7 @@
         </form>
       </section>
 
-      <section class="card budget-form-panel workspace-panel" data-workspace-panel="plan" data-mobile-screen="budget">
+      <section class="card budget-form-panel" data-app-screen="budget">
         <div class="section-head">
           <div>
             <p class="section-label">Budget limit</p>
@@ -523,7 +508,7 @@
         </div>
       </section>
 
-      <aside class="card controls-panel workspace-panel" data-workspace-panel="settings" data-mobile-screen="more" hidden>
+      <aside class="card controls-panel" data-app-screen="more">
         <p class="section-label">Data controls</p>
         <div class="action-row">
           <button id="exportButton" class="secondary-button" type="button">Export data</button>
@@ -541,7 +526,7 @@
         </p>
       </aside>
 
-      <section class="card ledger-panel workspace-panel" data-workspace-panel="plan" data-mobile-screen="income expense">
+      <section class="card ledger-panel" data-app-screen="income expense">
         <div class="section-head">
           <div>
             <p class="section-label">Recurring plan</p>
@@ -566,7 +551,7 @@
         </div>
       </section>
 
-      <section class="card transaction-ledger-panel workspace-panel" data-workspace-panel="activity" data-mobile-screen="income expense" hidden>
+      <section class="card transaction-ledger-panel" data-app-screen="income expense">
         <div class="section-head">
           <div>
             <p class="section-label">Transactions</p>
@@ -591,7 +576,7 @@
         </div>
       </section>
 
-      <section class="card account-ledger-panel workspace-panel" data-workspace-panel="accounts" data-mobile-screen="more" hidden>
+      <section class="card account-ledger-panel" data-app-screen="more">
         <div class="section-head">
           <div>
             <p class="section-label">Accounts</p>
@@ -615,7 +600,7 @@
         </div>
       </section>
 
-      <section class="card goal-ledger-panel workspace-panel" data-workspace-panel="accounts" data-mobile-screen="more" hidden>
+      <section class="card goal-ledger-panel" data-app-screen="more">
         <div class="section-head">
           <div>
             <p class="section-label">Goals</p>
@@ -639,15 +624,16 @@
         </div>
       </section>
     </section>
+    </main>
   </div>
 
   <nav class="mobile-tabbar" aria-label="Mobile navigation">
-    <button class="mobile-tab is-active" data-mobile-tab="summary" type="button" aria-pressed="true">Summary</button>
-    <button class="mobile-tab" data-mobile-tab="forecast" type="button" aria-pressed="false">Forecast</button>
-    <button class="mobile-tab" data-mobile-tab="income" type="button" aria-pressed="false">Income</button>
-    <button class="mobile-tab" data-mobile-tab="expense" type="button" aria-pressed="false">Expense</button>
-    <button class="mobile-tab" data-mobile-tab="budget" type="button" aria-pressed="false">Budget</button>
-    <button class="mobile-tab" data-mobile-tab="more" type="button" aria-pressed="false">More</button>
+    <button class="mobile-tab is-active" data-app-tab="summary" type="button" aria-pressed="true">Summary</button>
+    <button class="mobile-tab" data-app-tab="forecast" type="button" aria-pressed="false">Forecast</button>
+    <button class="mobile-tab" data-app-tab="income" type="button" aria-pressed="false">Income</button>
+    <button class="mobile-tab" data-app-tab="expense" type="button" aria-pressed="false">Expense</button>
+    <button class="mobile-tab" data-app-tab="budget" type="button" aria-pressed="false">Budget</button>
+    <button class="mobile-tab" data-app-tab="more" type="button" aria-pressed="false">More</button>
   </nav>
 
   <script src="app.js"></script>

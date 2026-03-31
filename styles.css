@@ -35,13 +35,14 @@
 }
 
 html {
+  height: 100%;
   scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
+  min-height: 100dvh;
+  overflow: hidden;
   color: var(--text);
   font-family: "Segoe UI Variable Text", "Aptos", "Trebuchet MS", sans-serif;
   background:
@@ -73,10 +74,73 @@ body::after {
 }
 
 .app-shell {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.app-nav {
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 18px;
+  flex: 0 0 auto;
+}
+
+.app-nav-brand {
   position: relative;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 28px 24px 80px;
+  z-index: 1;
+  display: grid;
+  gap: 4px;
+}
+
+.app-nav-title {
+  font-size: 1.1rem;
+  letter-spacing: -0.03em;
+}
+
+.desktop-tabbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.desktop-tab {
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.desktop-tab[aria-pressed="true"] {
+  border-color: rgba(21, 40, 34, 0.14);
+  background:
+    radial-gradient(circle at top right, rgba(195, 136, 44, 0.24), transparent 34%),
+    linear-gradient(155deg, var(--surface-dark), var(--surface-dark-strong));
+  color: var(--text-inverse);
+}
+
+.app-content {
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+  padding-bottom: 6px;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .card {
@@ -129,7 +193,6 @@ body::after {
 
 .app-header h1,
 .risk-banner h2,
-.manage-intro h2,
 .section-head h3 {
   margin: 0;
   font-family: "Aptos Display", "Segoe UI Variable Display", "Trebuchet MS", sans-serif;
@@ -909,9 +972,17 @@ td strong {
 }
 
 @media (max-width: 1220px) {
-  .header-grid,
-  .manage-head {
+  .header-grid {
     grid-template-columns: 1fr;
+  }
+
+  .app-nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .desktop-tabbar {
+    justify-content: flex-start;
   }
 
   .metrics-grid {
@@ -972,21 +1043,24 @@ td strong {
   }
 
   .app-shell {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    max-width: none;
-    height: 100dvh;
-    margin: 0;
     padding:
       calc(env(safe-area-inset-top, 0px) + 14px)
       calc(env(safe-area-inset-right, 0px) + 14px)
-      calc(env(safe-area-inset-bottom, 0px) + 110px)
+      calc(env(safe-area-inset-bottom, 0px) + 90px)
       calc(env(safe-area-inset-left, 0px) + 14px);
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch;
+    gap: 14px;
+  }
+
+  .app-nav {
+    padding: 14px 16px;
+  }
+
+  .desktop-tabbar {
+    display: none;
+  }
+
+  .app-content {
+    padding-bottom: 8px;
   }
 
   .app-header {
@@ -1008,7 +1082,6 @@ td strong {
   .spending-panel,
   .goals-overview-panel,
   .recent-panel,
-  .manage-intro,
   .form-panel,
   .transaction-form-panel,
   .account-form-panel,
@@ -1053,10 +1126,6 @@ td strong {
   .form-grid,
   .chart-foot {
     grid-template-columns: 1fr;
-  }
-
-  .manage-intro .workspace-tabs {
-    display: none;
   }
 
   .metric-card,
@@ -1146,7 +1215,7 @@ td strong {
 
 @media (max-width: 620px) {
   .app-shell {
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 106px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
   }
 
   .app-header h1 {
@@ -1155,10 +1224,6 @@ td strong {
 
   .risk-meta {
     grid-template-columns: 1fr;
-  }
-
-  .workspace-tab {
-    min-height: 84px;
   }
 
   .list-item {
