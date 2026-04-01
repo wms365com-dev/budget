@@ -587,7 +587,7 @@ function handleAppTabClick(event) {
 }
 
 function setActiveAppScreen(screen) {
-  const nextScreen = ["summary", "forecast", "income", "expense", "budget", "more"].includes(screen) ? screen : "summary";
+  const nextScreen = ["summary", "income", "expense", "budget", "accounts"].includes(screen) ? screen : "summary";
   uiState.activeScreen = nextScreen;
   syncEntryMode();
   syncAppScreens();
@@ -1182,7 +1182,7 @@ function fillTransactionForm(transaction) {
 }
 
 function fillAccountForm(account) {
-  setActiveAppScreen("more");
+  setActiveAppScreen("accounts");
 
   dom.accountFormTitle.textContent = `Edit ${account.name}`;
   dom.accountIdInput.value = account.id;
@@ -1195,7 +1195,7 @@ function fillAccountForm(account) {
 }
 
 function fillGoalForm(goal) {
-  setActiveAppScreen("more");
+  setActiveAppScreen("accounts");
 
   dom.goalFormTitle.textContent = `Edit ${goal.name}`;
   dom.goalIdInput.value = goal.id;

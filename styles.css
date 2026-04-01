@@ -423,7 +423,14 @@ body::after {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 18px;
+}
+
+.insights-grid {
   margin-top: 24px;
+}
+
+.management-grid {
+  margin-top: 0;
 }
 
 .chart-panel,
@@ -589,17 +596,6 @@ body::after {
 
 .account-ledger-panel {
   grid-column: 5 / span 8;
-}
-
-@media (min-width: 921px) {
-  .form-panel,
-  .transaction-form-panel,
-  .budget-form-panel {
-    position: sticky;
-    top: 0;
-    align-self: start;
-    z-index: 1;
-  }
 }
 
 .section-head {

@@ -18,11 +18,10 @@
       </div>
       <nav class="desktop-tabbar" aria-label="App sections">
         <button class="desktop-tab is-active" data-app-tab="summary" type="button" aria-pressed="true">Summary</button>
-        <button class="desktop-tab" data-app-tab="forecast" type="button" aria-pressed="false">Forecast</button>
         <button class="desktop-tab" data-app-tab="income" type="button" aria-pressed="false">Income</button>
         <button class="desktop-tab" data-app-tab="expense" type="button" aria-pressed="false">Expense</button>
         <button class="desktop-tab" data-app-tab="budget" type="button" aria-pressed="false">Budget</button>
-        <button class="desktop-tab" data-app-tab="more" type="button" aria-pressed="false">More</button>
+        <button class="desktop-tab" data-app-tab="accounts" type="button" aria-pressed="false">Accounts</button>
       </nav>
     </header>
 
@@ -34,7 +33,7 @@
           <h1>See the squeeze before it turns into panic.</h1>
           <p class="hero-text">
             The top answers the urgent questions fast: what is safe to spend, what is due soon, and whether month-end
-            still works. The tabs move you straight into income, expenses, budget, forecast, and the rest without
+            still works. The tabs move you straight into income, expenses, budget, and accounts without
             sending you on a long scroll.
           </p>
           <div class="hero-badges" aria-label="Product highlights">
@@ -52,7 +51,7 @@
       </div>
     </header>
 
-    <section id="riskBanner" class="card risk-banner tone-safe" data-app-screen="summary forecast">
+    <section id="riskBanner" class="card risk-banner tone-safe" data-app-screen="summary">
       <div>
         <p class="section-label">Cash flow outlook</p>
         <h2 id="riskTitle">You stay above your buffer.</h2>
@@ -120,8 +119,8 @@
       </article>
     </section>
 
-    <section class="insights-grid" data-app-screen="summary forecast">
-      <section class="card chart-panel" data-app-screen="summary forecast">
+    <section class="insights-grid" data-app-screen="summary">
+      <section class="card chart-panel" data-app-screen="summary">
         <div class="section-head">
           <div>
             <p class="section-label">Forecast</p>
@@ -148,7 +147,7 @@
         </div>
       </section>
 
-      <section class="card upcoming-panel" data-app-screen="summary forecast">
+      <section class="card upcoming-panel" data-app-screen="summary">
         <div class="section-head">
           <div>
             <p class="section-label">Upcoming cash events</p>
@@ -209,7 +208,7 @@
       </section>
     </section>
 
-    <section class="management-grid" data-app-screen="income expense budget more">
+    <section class="management-grid" data-app-screen="income expense budget accounts">
       <section class="card form-panel" data-app-screen="income expense">
         <div class="section-head">
           <div>
@@ -341,7 +340,7 @@
         </form>
       </section>
 
-      <section class="card account-form-panel" data-app-screen="more">
+      <section class="card account-form-panel" data-app-screen="accounts">
         <div class="section-head">
           <div>
             <p class="section-label">Account</p>
@@ -386,7 +385,7 @@
         </form>
       </section>
 
-      <section class="card goal-form-panel" data-app-screen="more">
+      <section class="card goal-form-panel" data-app-screen="accounts">
         <div class="section-head">
           <div>
             <p class="section-label">Goal</p>
@@ -429,7 +428,7 @@
         </form>
       </section>
 
-      <section class="card settings-panel" data-app-screen="more">
+      <section class="card settings-panel" data-app-screen="accounts">
         <div class="section-head">
           <div>
             <p class="section-label">Forecast settings</p>
@@ -509,7 +508,7 @@
         </div>
       </section>
 
-      <aside class="card controls-panel" data-app-screen="more">
+      <aside class="card controls-panel" data-app-screen="accounts">
         <p class="section-label">Data controls</p>
         <div class="action-row">
           <button id="exportButton" class="secondary-button" type="button">Export data</button>
@@ -577,7 +576,7 @@
         </div>
       </section>
 
-      <section class="card account-ledger-panel" data-app-screen="more">
+      <section class="card account-ledger-panel" data-app-screen="accounts">
         <div class="section-head">
           <div>
             <p class="section-label">Accounts</p>
@@ -601,7 +600,7 @@
         </div>
       </section>
 
-      <section class="card goal-ledger-panel" data-app-screen="more">
+      <section class="card goal-ledger-panel" data-app-screen="accounts">
         <div class="section-head">
           <div>
             <p class="section-label">Goals</p>
@@ -630,11 +629,10 @@
 
   <nav class="mobile-tabbar" aria-label="Mobile navigation">
     <button class="mobile-tab is-active" data-app-tab="summary" type="button" aria-pressed="true">Summary</button>
-    <button class="mobile-tab" data-app-tab="forecast" type="button" aria-pressed="false">Forecast</button>
     <button class="mobile-tab" data-app-tab="income" type="button" aria-pressed="false">Income</button>
     <button class="mobile-tab" data-app-tab="expense" type="button" aria-pressed="false">Expense</button>
     <button class="mobile-tab" data-app-tab="budget" type="button" aria-pressed="false">Budget</button>
-    <button class="mobile-tab" data-app-tab="more" type="button" aria-pressed="false">More</button>
+    <button class="mobile-tab" data-app-tab="accounts" type="button" aria-pressed="false">Accounts</button>
   </nav>
 
   <script src="app.js"></script>
