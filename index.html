@@ -14,7 +14,8 @@
     <header class="app-nav card">
       <div class="app-nav-brand">
         <p class="eyebrow">Budget Flow Dashboard</p>
-        <strong class="app-nav-title">Personal cash flow</strong>
+        <strong id="appNavTitle" class="app-nav-title">Summary</strong>
+        <span id="appNavMeta" class="app-nav-meta">Cash outlook and overall plan</span>
       </div>
       <nav class="desktop-tabbar" aria-label="App sections">
         <button class="desktop-tab is-active" data-app-tab="summary" type="button" aria-pressed="true">Summary</button>
@@ -208,6 +209,14 @@
       </section>
     </section>
 
+    <section id="taskScreenHead" class="card task-screen-head" data-app-screen="income expense budget accounts">
+      <p id="taskScreenLabel" class="section-label">Income</p>
+      <h2 id="taskScreenTitle">Enter income at the top and review it below.</h2>
+      <p id="taskScreenText" class="supporting-text">
+        Keep this screen focused on one job. Add new information first, then check the saved log underneath.
+      </p>
+    </section>
+
     <section class="management-grid" data-app-screen="income expense budget accounts">
       <section class="card form-panel" data-app-screen="income expense">
         <div class="section-head">
@@ -218,9 +227,8 @@
         </div>
 
         <div class="guide-box">
-          <p><strong>Income:</strong> choose <em>Income</em>, enter the amount, and use the first pay date.</p>
-          <p><strong>Expenses:</strong> choose <em>Expense</em>, enter the amount, and use the due date.</p>
-          <p><strong>Schedule:</strong> use <em>One time</em> for a single payment, or choose a repeating schedule for recurring bills or paychecks.</p>
+          <p><strong>Planned entries:</strong> use this card for paychecks, bills, and anything you expect ahead of time.</p>
+          <p><strong>Schedule:</strong> use <em>One time</em> for a single payment, or choose a repeating schedule for recurring items.</p>
         </div>
 
         <form id="itemForm" class="form-grid">
@@ -289,7 +297,7 @@
         </div>
 
         <div class="guide-box">
-          <p><strong>Use transactions</strong> to record what actually happened this month. They power spending summaries and make the budget feel more like Monarch.</p>
+          <p><strong>Actual entries:</strong> use this card for what already happened so the month stays accurate.</p>
         </div>
 
         <form id="transactionForm" class="form-grid">

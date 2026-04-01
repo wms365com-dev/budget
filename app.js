@@ -36,6 +36,8 @@ let activeSavePromise = Promise.resolve();
 const dom = {
   appShell: document.getElementById("appShell"),
   appContent: document.getElementById("appContent"),
+  appNavTitle: document.getElementById("appNavTitle"),
+  appNavMeta: document.getElementById("appNavMeta"),
   exportButton: document.getElementById("exportButton"),
   importInput: document.getElementById("importInput"),
   clearDataButton: document.getElementById("clearDataButton"),
@@ -72,6 +74,9 @@ const dom = {
   recentTransactionsList: document.getElementById("recentTransactionsList"),
   appTabs: Array.from(document.querySelectorAll("[data-app-tab]")),
   appScreens: Array.from(document.querySelectorAll("[data-app-screen]")),
+  taskScreenLabel: document.getElementById("taskScreenLabel"),
+  taskScreenTitle: document.getElementById("taskScreenTitle"),
+  taskScreenText: document.getElementById("taskScreenText"),
   settingsForm: document.getElementById("settingsForm"),
   currentBalanceInput: document.getElementById("currentBalanceInput"),
   safetyBufferInput: document.getElementById("safetyBufferInput"),
@@ -617,6 +622,7 @@ function renderApp() {
   syncForms();
   syncEntryMode();
   syncAppScreens();
+  syncScreenCopy();
   renderOverview();
   renderForecast();
   renderUpcoming();
@@ -638,6 +644,15 @@ function syncForms() {
   dom.currentBalanceInput.value = state.settings.currentBalance;
   dom.safetyBufferInput.value = state.settings.safetyBuffer;
   dom.forecastDaysInput.value = String(state.settings.forecastDays);
+}
+
+function syncScreenCopy() {
+  const copy = getScreenCopy(uiState.activeScreen);
+  dom.appNavTitle.textContent = copy.navTitle;
+  dom.appNavMeta.textContent = copy.navMeta;
+  dom.taskScreenLabel.textContent = copy.taskLabel;
+  dom.taskScreenTitle.textContent = copy.taskTitle;
+  dom.taskScreenText.textContent = copy.taskText;
 }
 
 function syncEntryMode() {
@@ -1338,6 +1353,56 @@ function getRecentTransactionEmptyStateMessage() {
   }
 
   return "Recent transactions will show up here once you start logging real activity.";
+}
+
+function getScreenCopy(screen) {
+  if (screen === "income") {
+    return {
+      navTitle: "Income",
+      navMeta: "Planned and actual income",
+      taskLabel: "Income",
+      taskTitle: "Add income at the top and review it below.",
+      taskText: "Use the first card for planned income and the second card for actual deposits. Saved income stays underneath."
+    };
+  }
+
+  if (screen === "expense") {
+    return {
+      navTitle: "Expenses",
+      navMeta: "Planned bills and actual spending",
+      taskLabel: "Expenses",
+      taskTitle: "Add expenses at the top and review them below.",
+      taskText: "Use the first card for planned bills and the second card for real spending. Saved expense entries stay underneath."
+    };
+  }
+
+  if (screen === "budget") {
+    return {
+      navTitle: "Budget",
+      navMeta: "Limits and category guardrails",
+      taskLabel: "Budget",
+      taskTitle: "Set category limits at the top and review them below.",
+      taskText: "Keep this screen focused on monthly guardrails. Update limits first, then check the saved budget list underneath."
+    };
+  }
+
+  if (screen === "accounts") {
+    return {
+      navTitle: "Accounts",
+      navMeta: "Accounts, goals, and settings",
+      taskLabel: "Accounts",
+      taskTitle: "Update accounts and goals at the top and review them below.",
+      taskText: "Use this screen for balances, savings goals, settings, and backups. Saved account and goal records stay underneath."
+    };
+  }
+
+  return {
+    navTitle: "Summary",
+    navMeta: "Cash outlook and overall plan",
+    taskLabel: "Summary",
+    taskTitle: "See the full picture in one place.",
+    taskText: "This screen keeps your risk, runway, upcoming cash events, categories, accounts, and goals together."
+  };
 }
 
 function updateScheduleLabel() {
